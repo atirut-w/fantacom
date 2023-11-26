@@ -17,4 +17,6 @@ set(Z80_WITH_IM0_RETX_NOTIFICATIONS YES)
 set(Z80_WITH_Q YES)
 set(Z80_WITH_ZILOG_NMOS_LD_A_IR_BUG YES)
 
-target_link_libraries("fantacom" "Z80")
+add_subdirectory("3rd/argparse")
+
+target_link_libraries("fantacom" "Z80" "argparse")

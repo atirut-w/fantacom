@@ -4,3 +4,6 @@
 [submodule "3rd/zeta"]
 	path = 3rd/Zeta
 	url = https://github.com/redcode/Zeta
+[submodule "3rd/argparse"]
+	path = 3rd/argparse
+	url = https://github.com/p-ranav/argparse
