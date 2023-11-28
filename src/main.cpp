@@ -1,5 +1,7 @@
 #include <iostream>
 #include <argparse/argparse.hpp>
+#include <machine.hpp>
+#include <fstream>
 
 using namespace std;
 
@@ -26,7 +28,29 @@ int main(int argc, char *argv[])
     {
         std::cout << err.what() << std::endl;
         std::cout << parser;
-        exit(0);
+        exit(1);
+    }
+
+    Machine machine;
+    machine.ram.resize(parser.get<int>("--ram") * 0x1000);
+
+    {
+        ifstream bootrom(parser.get<string>("bootrom"), ios::binary);
+        if (!bootrom)
+        {
+            cerr << "Could not open boot ROM image" << endl;
+            exit(1);
+        }
+        bootrom.read((char *)machine.rom.data(), machine.rom.size());
+    }
+
+    Z80 cpu;
+    z80_instant_reset(&cpu);
+    z80_power(&cpu, 1);
+
+    while (1)
+    {
+        z80_run(&cpu, 1);
     }
 
     return 0;

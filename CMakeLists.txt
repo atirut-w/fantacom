@@ -3,6 +3,7 @@ project("Fantasy Computer")
 
 add_executable("fantacom"
     "src/main.cpp"
+    "src/machine.cpp"
 )
 target_include_directories("fantacom" PRIVATE "include")
 
