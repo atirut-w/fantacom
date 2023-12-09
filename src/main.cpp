@@ -44,13 +44,9 @@ int main(int argc, char *argv[])
         bootrom.read((char *)machine.rom.data(), machine.rom.size());
     }
 
-    Z80 cpu;
-    z80_instant_reset(&cpu);
-    z80_power(&cpu, 1);
-
     while (1)
     {
-        z80_run(&cpu, 1);
+        z80_execute(&machine.cpu, 1);
     }
 
     return 0;
