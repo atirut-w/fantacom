@@ -2,6 +2,7 @@
 #include <argparse/argparse.hpp>
 #include <machine.hpp>
 #include <fstream>
+#include <filesystem>
 
 using namespace std;
 
@@ -36,11 +37,17 @@ int main(int argc, char *argv[])
 
     {
         ifstream bootrom(parser.get<string>("bootrom"), ios::binary);
+
         if (!bootrom)
         {
             cerr << "Could not open boot ROM image" << endl;
             exit(1);
         }
+        if (filesystem::file_size(parser.get<string>("bootrom")) > machine.rom.size())
+        {
+            cerr << "WARN: Boot ROM image too large, truncating" << endl;
+        }
+
         bootrom.read((char *)machine.rom.data(), machine.rom.size());
     }
 
