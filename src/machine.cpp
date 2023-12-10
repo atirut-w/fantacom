@@ -42,6 +42,24 @@ void write(void *ctx, uint16_t addr, uint8_t val)
     machine.ram[physical] = val;
 }
 
+uint8_t in(void *ctx, uint16_t port)
+{
+    cout << "TODO: I/O port read at $" << hex << port << endl;
+    return 0;
+}
+
+void out(void *ctx, uint16_t port, uint8_t val)
+{
+    port &= 0xff;
+
+    if (port >= 0 && port < 16)
+    {
+        Machine &machine = *(Machine *)ctx;
+        machine.pagetable[port] = val;
+        return;
+    }
+}
+
 Machine::Machine()
 {
     cpu.context = this;
@@ -50,6 +68,8 @@ Machine::Machine()
     cpu.fetch = read;
     cpu.read = read;
     cpu.write = write;
+    cpu.in = in;
+    cpu.out = out;
 
     pagetable[0] = 0;
 }
