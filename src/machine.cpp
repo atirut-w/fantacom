@@ -1,6 +1,7 @@
 #include <machine.hpp>
 #include <iostream>
 #include <iomanip>
+#include <mmu_controller.hpp>
 
 using namespace std;
 
@@ -51,13 +52,19 @@ uint8_t in(void *ctx, uint16_t port)
 
 void out(void *ctx, uint16_t port, uint8_t val)
 {
-    port &= 0xff;
-
-    if (port >= 0 && port < 16)
+    Machine &machine = *(Machine *)ctx;
+    
+    for (auto &pair : machine.io_devices)
     {
-        Machine &machine = *(Machine *)ctx;
-        machine.pagetable[port] = val;
-        return;
+        IODevice *device = pair.second;
+        uint16_t end = pair.first + device->size;
+        uint16_t actual_port = device->lsb_only ? port & 0xff : port;
+        
+        if (actual_port >= pair.first && actual_port < end)
+        {
+            device->write(actual_port - pair.first, val);
+            return;
+        }
     }
 }
 
@@ -71,4 +78,5 @@ Machine::Machine()
     cpu.write = write;
     cpu.in = in;
     cpu.out = out;
+    io_devices[0] = new MMUController(this);
 }
