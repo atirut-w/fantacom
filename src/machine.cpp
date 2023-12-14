@@ -46,8 +46,19 @@ void write(void *ctx, uint16_t addr, uint8_t val)
 
 uint8_t in(void *ctx, uint16_t port)
 {
-    cout << "TODO: I/O port read at $" << hex << port << endl;
-    return 0;
+    Machine &machine = *(Machine *)ctx;
+    
+    for (auto &pair : machine.io_devices)
+    {
+        IODevice *device = pair.second;
+        uint16_t end = pair.first + device->size;
+        uint16_t actual_port = device->lsb_only ? port & 0xff : port;
+        
+        if (actual_port >= pair.first && actual_port < end)
+        {
+            return device->read(actual_port - pair.first);
+        }
+    }
 }
 
 void out(void *ctx, uint16_t port, uint8_t val)
