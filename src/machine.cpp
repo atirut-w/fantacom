@@ -9,7 +9,7 @@ uint8_t read(void *ctx, uint16_t addr)
 {
     Machine &machine = *(Machine *)ctx;
     
-    if (addr < machine.rom.size())
+    if (addr < machine.rom.size() && (machine.mmu_flags & Machine::ROM_ENABLE))
     {
         return machine.rom[addr];
     }
@@ -78,5 +78,7 @@ Machine::Machine()
     cpu.write = write;
     cpu.in = in;
     cpu.out = out;
+
+    mmu_flags = ROM_ENABLE;
     io_devices[0] = new MMUController(this);
 }

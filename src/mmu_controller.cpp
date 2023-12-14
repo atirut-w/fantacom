@@ -9,7 +9,16 @@ MMUController::MMUController(void *ctx) : IODevice(ctx)
 
 uint8_t MMUController::read(uint16_t addr)
 {
-    return 0;
+    Machine &machine = *(Machine *)ctx;
+
+    if (addr == 0)
+    {
+        return machine.mmu_flags;
+    }
+    else
+    {
+        return machine.pagetable[addr - 1];
+    }
 }
 
 void MMUController::write(uint16_t addr, uint8_t val)
@@ -18,7 +27,7 @@ void MMUController::write(uint16_t addr, uint8_t val)
 
     if (addr == 0)
     {
-        // TODO: Set flags
+        machine.mmu_flags = val;
     }
     else
     {
