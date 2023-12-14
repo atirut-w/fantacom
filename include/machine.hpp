@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <io_device.hpp>
+#include <mutex>
 
 class Machine
 {
@@ -24,4 +25,7 @@ public:
     uint8_t mmu_flags;
 
     std::map<uint16_t, IODevice*> io_devices;
+
+    std::mutex cpu_mutex;
+    std::mutex ram_mutex; // Thought this wasn't needed, but multiple devices may access RAM at once
 };
