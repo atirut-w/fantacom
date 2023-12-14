@@ -59,6 +59,9 @@ uint8_t in(void *ctx, uint16_t port)
             return device->read(actual_port - pair.first);
         }
     }
+
+    cerr << "WARN: Unhandled I/O read at $" << hex << port << endl;
+    return 0;
 }
 
 void out(void *ctx, uint16_t port, uint8_t val)
