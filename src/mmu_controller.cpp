@@ -1,8 +1,9 @@
 #include <mmu_controller.hpp>
 #include <machine.hpp>
 
-MMUController::MMUController(void *ctx) : IODevice(ctx)
+MMUController::MMUController(void *ctx)
 {
+    this->ctx = ctx;
     size = 17;
     lsb_only = true;
 }
