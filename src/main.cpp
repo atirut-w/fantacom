@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
     while (1)
     {
-        z80_run(&machine.cpu, 1);
+        machine.tick();
     }
 
     return 0;

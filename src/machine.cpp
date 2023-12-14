@@ -96,3 +96,18 @@ Machine::Machine()
     mmu_flags = ROM_ENABLE;
     io_devices[0] = new MMUController(this);
 }
+
+Machine::~Machine()
+{
+    for (auto &pair : io_devices)
+    {
+        delete pair.second;
+    }
+}
+
+void Machine::tick()
+{
+    cpu_mutex.lock();
+    z80_run(&cpu, 1);
+    cpu_mutex.unlock();
+}
