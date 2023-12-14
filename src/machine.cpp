@@ -7,16 +7,17 @@ using namespace std;
 uint8_t read(void *ctx, uint16_t addr)
 {
     Machine &machine = *(Machine *)ctx;
+    
+    if (addr < machine.rom.size())
+    {
+        return machine.rom[addr];
+    }
 
     // Resolve physical address
     int page = machine.pagetable[addr >> 12];
     int physical = (page << 12) | (addr & 0xfff);
-    
-    if (physical < machine.rom.size())
-    {
-        return machine.rom[physical];
-    }
-    else if (physical >= machine.ram.size())
+
+    if (physical >= machine.ram.size())
     {
         cerr << "WARN: Out of bounds read at $" << hex << addr << " -> $" << physical << endl;
         return 0;
@@ -70,6 +71,4 @@ Machine::Machine()
     cpu.write = write;
     cpu.in = in;
     cpu.out = out;
-
-    pagetable[0] = 0;
 }
