@@ -1,6 +1,7 @@
 #include <machine.hpp>
 #include <iostream>
 #include <iomanip>
+#include <mmu_controller.hpp>
 
 using namespace std;
 
@@ -8,7 +9,7 @@ uint8_t read(void *ctx, uint16_t addr)
 {
     Machine &machine = *(Machine *)ctx;
     
-    if (addr < machine.rom.size())
+    if (addr < machine.rom.size() && (machine.mmu_flags & Machine::ROM_ENABLE))
     {
         return machine.rom[addr];
     }
@@ -45,19 +46,36 @@ void write(void *ctx, uint16_t addr, uint8_t val)
 
 uint8_t in(void *ctx, uint16_t port)
 {
-    cout << "TODO: I/O port read at $" << hex << port << endl;
-    return 0;
+    Machine &machine = *(Machine *)ctx;
+    
+    for (auto &pair : machine.io_devices)
+    {
+        IODevice *device = pair.second;
+        uint16_t end = pair.first + device->size;
+        uint16_t actual_port = device->lsb_only ? port & 0xff : port;
+        
+        if (actual_port >= pair.first && actual_port < end)
+        {
+            return device->read(actual_port - pair.first);
+        }
+    }
 }
 
 void out(void *ctx, uint16_t port, uint8_t val)
 {
-    port &= 0xff;
-
-    if (port >= 0 && port < 16)
+    Machine &machine = *(Machine *)ctx;
+    
+    for (auto &pair : machine.io_devices)
     {
-        Machine &machine = *(Machine *)ctx;
-        machine.pagetable[port] = val;
-        return;
+        IODevice *device = pair.second;
+        uint16_t end = pair.first + device->size;
+        uint16_t actual_port = device->lsb_only ? port & 0xff : port;
+        
+        if (actual_port >= pair.first && actual_port < end)
+        {
+            device->write(actual_port - pair.first, val);
+            return;
+        }
     }
 }
 
@@ -71,4 +89,7 @@ Machine::Machine()
     cpu.write = write;
     cpu.in = in;
     cpu.out = out;
+
+    mmu_flags = ROM_ENABLE;
+    io_devices[0] = new MMUController(this);
 }
