@@ -14,8 +14,6 @@ public:
     {
         ROM_ENABLE = 1 << 0,
     };
-    
-    Machine();
 
     Z80 cpu;
     std::array<uint8_t, 0x2000> rom;
@@ -28,4 +26,8 @@ public:
 
     std::mutex cpu_mutex;
     std::mutex ram_mutex; // Thought this wasn't needed, but multiple devices may access RAM at once
+    
+    Machine();
+    ~Machine();
+    void tick();
 };
