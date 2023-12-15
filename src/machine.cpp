@@ -1,7 +1,7 @@
 #include <machine.hpp>
 #include <iostream>
 #include <iomanip>
-#include <mmu_controller.hpp>
+#include <io_devices/mmu_controller.hpp>
 
 using namespace std;
 

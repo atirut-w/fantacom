@@ -4,7 +4,8 @@ project("Fantasy Computer")
 add_executable("fantacom"
     "src/main.cpp"
     "src/machine.cpp"
-    "src/mmu_controller.cpp"
+    
+    "src/io_devices/mmu_controller.cpp"
 )
 target_include_directories("fantacom" PRIVATE "include")
 
