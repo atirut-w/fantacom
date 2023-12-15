@@ -13,7 +13,9 @@ void display_main(DisplayKeyboardController *controller)
     while (!WindowShouldClose())
     {
         BeginDrawing();
-        ClearBackground(BLACK);
+        controller->self_mutex.lock();
+
+        controller->self_mutex.unlock();
         EndDrawing();
     }
 
@@ -27,12 +29,11 @@ DisplayKeyboardController::DisplayKeyboardController(void *ctx)
     lsb_only = true;
 
     raylib_thread = std::thread(display_main, this);
-    raylib_thread.detach();
 }
 
 DisplayKeyboardController::~DisplayKeyboardController()
 {
-    raylib_thread.~thread();
+    raylib_thread.join();
 }
 
 uint8_t DisplayKeyboardController::read(uint16_t addr)
@@ -42,5 +43,25 @@ uint8_t DisplayKeyboardController::read(uint16_t addr)
 
 void DisplayKeyboardController::write(uint16_t addr, uint8_t val)
 {
-    // WIP
+    self_mutex.lock();
+    switch (addr)
+    {
+        case 0x00:
+            vram_addr &= 0xffffff00;
+            vram_addr |= val;
+            break;
+        case 0x01:
+            vram_addr &= 0xffff00ff;
+            vram_addr |= val << 8;
+            break;
+        case 0x02:
+            vram_addr &= 0xff00ffff;
+            vram_addr |= val << 16;
+            break;
+        case 0x03:
+            vram_addr &= 0x00ffffff;
+            vram_addr |= val << 24;
+            break;
+    }
+    self_mutex.unlock();
 }
