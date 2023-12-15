@@ -1,9 +1,14 @@
 #pragma once
 #include <io_device.hpp>
 #include <cstdint>
+#include <thread>
+#include <mutex>
 
 class DisplayKeyboardController : public IODevice
 {
+private:
+    std::thread raylib_thread;
+    std::mutex self_mutex;
 public:
     DisplayKeyboardController(void *ctx);
     ~DisplayKeyboardController();

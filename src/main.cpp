@@ -3,6 +3,7 @@
 #include <machine.hpp>
 #include <fstream>
 #include <filesystem>
+#include <globals.hpp>
 
 using namespace std;
 
@@ -51,7 +52,8 @@ int main(int argc, char *argv[])
         bootrom.read((char *)machine.rom.data(), machine.rom.size());
     }
 
-    while (1)
+    Globals::running = true;
+    while (Globals::running)
     {
         machine.tick();
     }

@@ -3,6 +3,7 @@ project("Fantasy Computer")
 
 add_executable("fantacom"
     "src/main.cpp"
+    "src/globals.cpp"
     "src/machine.cpp"
 
     "src/io_devices/mmu_controller.cpp"
