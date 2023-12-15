@@ -7,3 +7,6 @@
 [submodule "3rd/argparse"]
 	path = 3rd/argparse
 	url = https://github.com/p-ranav/argparse
+[submodule "3rd/raylib"]
+	path = 3rd/raylib
+	url = https://github.com/raysan5/raylib
