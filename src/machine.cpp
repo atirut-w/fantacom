@@ -2,7 +2,6 @@
 #include <iostream>
 #include <iomanip>
 #include <io_devices/mmu_controller.hpp>
-#include <io_devices/disp_kb_controller.hpp>
 
 using namespace std;
 
@@ -96,7 +95,7 @@ Machine::Machine()
 
     mmu_flags = ROM_ENABLE;
     io_devices[0] = new MMUController(this);
-    io_devices[0x20] = new DisplayKeyboardController(this);
+    // io_devices[0x20] = new DisplayKeyboardController(this);
 }
 
 Machine::~Machine()
