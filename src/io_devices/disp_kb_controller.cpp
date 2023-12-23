@@ -7,13 +7,26 @@ void display_main(DisplayKeyboardController *controller)
 {
     Machine &machine = *(Machine *)controller->ctx;
     
-    InitWindow(720, 400, "Fantacom");
+    InitWindow(16 * 80, 16 * 25, "Fantacom");
     SetTargetFPS(60);
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
         controller->self_mutex.lock();
+        ClearBackground(BLACK);
+
+        int vram_offset = controller->control.vram_page * 0x1000;
+        char character[2] = {0, 0};
+
+        for (int y = 0; y < 25; y++)
+        {
+            for (int x = 0; x < 80; x++)
+            {
+                character[0] = vram_offset > machine.ram.size() ? ' ' : machine.ram[vram_offset++];
+                DrawText(character, x * 16, y * 16, 16, WHITE);
+            }
+        }
 
         controller->self_mutex.unlock();
         EndDrawing();
