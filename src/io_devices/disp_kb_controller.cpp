@@ -38,7 +38,11 @@ DisplayKeyboardController::~DisplayKeyboardController()
 
 uint8_t DisplayKeyboardController::read(uint16_t addr)
 {
-    return 0; // WIP
+    if (addr < sizeof(control))
+    {
+        return ((uint8_t *)&control)[addr];
+    }
+    return 0;
 }
 
 void DisplayKeyboardController::write(uint16_t addr, uint8_t val)
