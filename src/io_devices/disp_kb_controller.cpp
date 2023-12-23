@@ -44,24 +44,11 @@ uint8_t DisplayKeyboardController::read(uint16_t addr)
 void DisplayKeyboardController::write(uint16_t addr, uint8_t val)
 {
     self_mutex.lock();
-    switch (addr)
+    
+    if (addr < sizeof(control))
     {
-        case 0x00:
-            vram_addr &= 0xffffff00;
-            vram_addr |= val;
-            break;
-        case 0x01:
-            vram_addr &= 0xffff00ff;
-            vram_addr |= val << 8;
-            break;
-        case 0x02:
-            vram_addr &= 0xff00ffff;
-            vram_addr |= val << 16;
-            break;
-        case 0x03:
-            vram_addr &= 0x00ffffff;
-            vram_addr |= val << 24;
-            break;
+        ((uint8_t *)&control)[addr] = val;
     }
+
     self_mutex.unlock();
 }

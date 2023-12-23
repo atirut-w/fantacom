@@ -15,5 +15,7 @@ public:
     void write(uint16_t addr, uint8_t val) override;
     
     std::mutex self_mutex;
-    uint32_t vram_addr;
+    struct {
+        uint8_t vram_page = 0;
+    } control;
 };
