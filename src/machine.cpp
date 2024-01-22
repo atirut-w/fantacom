@@ -93,6 +93,12 @@ Machine::Machine()
     cpu.in = in;
     cpu.out = out;
 
+#ifdef _WIN32
+    // Null out unused callbacks, because Windows can't be trusted to zero out the struct
+    cpu.halt = nullptr;
+    cpu.nmia = nullptr;
+#endif
+
     mmu_flags = ROM_ENABLE;
     io_devices[0] = new MMUController(this);
     // io_devices[0x20] = new DisplayKeyboardController(this);
