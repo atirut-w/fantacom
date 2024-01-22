@@ -3,9 +3,11 @@ project("Fantasy Computer")
 
 add_executable("fantacom"
     "src/main.cpp"
+    "src/globals.cpp"
     "src/machine.cpp"
-    
+
     "src/io_devices/mmu_controller.cpp"
+    "src/io_devices/disp_kb_controller.cpp"
 )
 target_include_directories("fantacom" PRIVATE "include")
 
@@ -22,5 +24,6 @@ set(Z80_SHARED_LIBS NO)
 add_subdirectory("3rd/Z80")
 
 add_subdirectory("3rd/argparse")
+add_subdirectory("3rd/raylib")
 
-target_link_libraries("fantacom" "Z80" "argparse")
+target_link_libraries("fantacom" "Z80" "argparse" "raylib")

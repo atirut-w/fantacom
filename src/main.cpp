@@ -3,6 +3,8 @@
 #include <machine.hpp>
 #include <fstream>
 #include <filesystem>
+#include <globals.hpp>
+#include <io_devices/disp_kb_controller.hpp>
 
 using namespace std;
 
@@ -51,7 +53,10 @@ int main(int argc, char *argv[])
         bootrom.read((char *)machine.rom.data(), machine.rom.size());
     }
 
-    while (1)
+    machine.io_devices[0x20] = new DisplayKeyboardController(&machine);
+
+    Globals::running = true;
+    while (Globals::running)
     {
         machine.tick();
     }
