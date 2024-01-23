@@ -2,6 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <io_devices/mmu.hpp>
+#include <memory>
 
 using namespace std;
 
@@ -84,6 +85,7 @@ void out(void *ctx, uint16_t port, uint8_t val)
 
 Machine::Machine()
 {
+    std::memset(&cpu, 0, sizeof(cpu)); // TODO: Z80 core as a C++ library and not C
     cpu.context = this;
 
     cpu.fetch_opcode = read;
@@ -93,14 +95,7 @@ Machine::Machine()
     cpu.in = in;
     cpu.out = out;
 
-#ifdef _WIN32
-    // Null out unused callbacks, because Windows can't be trusted to zero out the struct
-    cpu.halt = nullptr;
-    cpu.nmia = nullptr;
-#endif
-
     mmu = new MMU();
-
     io_devices[0] = mmu;
     // io_devices[0x20] = new DisplayKeyboardController(this);
 }
