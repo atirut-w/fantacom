@@ -61,10 +61,15 @@ int main(int argc, char *argv[])
     InitWindow(640, 480, "Fantacom - Initialising...");
     SetTargetFPS(60);
     int frequency = parser.get<int>("--frequency");
+    int runover = 0; // The CPU is instruction-stepped, so we need to keep track of how many cycles we've run over by
 
     while (!WindowShouldClose())
     {
-        z80_run(&machine.cpu, GetFrameTime() * frequency * 1000000);
+        int target = (frequency * 1000000) * GetFrameTime();
+        int cycles_ran = z80_run(&machine.cpu, target - runover);
+        runover = cycles_ran - target;
+
+        cout << "Ran " << dec << cycles_ran << " cycles (ran over by " << runover << ")" << endl;
         
         BeginDrawing();
         ClearBackground(BLACK);
