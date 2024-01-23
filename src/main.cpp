@@ -3,8 +3,7 @@
 #include <machine.hpp>
 #include <fstream>
 #include <filesystem>
-#include <globals.hpp>
-#include <io_devices/disp_kb_controller.hpp>
+#include <raylib.h>
 
 using namespace std;
 
@@ -21,6 +20,12 @@ int main(int argc, char *argv[])
     parser.add_argument("-r", "--ram")
         .help("Number of 4KiB RAM banks to allocate")
         .default_value(4)
+        .scan<'i', int>();
+    
+    // Approx. CPU frequency in MHz
+    parser.add_argument("-f", "--frequency")
+        .help("CPU frequency in MHz")
+        .default_value(1)
         .scan<'i', int>();
 
     try
@@ -53,12 +58,19 @@ int main(int argc, char *argv[])
         bootrom.read((char *)machine.rom.data(), machine.rom.size());
     }
 
-    machine.io_devices[0x20] = new DisplayKeyboardController(&machine);
+    InitWindow(640, 480, "Fantacom - Initialising...");
+    SetTargetFPS(60);
+    int frequency = parser.get<int>("--frequency");
 
-    Globals::running = true;
-    while (Globals::running)
+    while (!WindowShouldClose())
     {
-        machine.tick();
+        z80_run(&machine.cpu, GetFrameTime() * frequency * 1000000);
+        
+        BeginDrawing();
+        ClearBackground(BLACK);
+        EndDrawing();
+
+        SetWindowTitle(("Fantacom - Running at " + to_string(GetFPS()) + " FPS").c_str());
     }
 
     return 0;

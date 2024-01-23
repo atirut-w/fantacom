@@ -7,7 +7,6 @@ add_executable("fantacom"
     "src/machine.cpp"
 
     "src/io_devices/mmu_controller.cpp"
-    "src/io_devices/disp_kb_controller.cpp"
 )
 target_include_directories("fantacom" PRIVATE "include")
 

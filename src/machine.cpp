@@ -111,10 +111,3 @@ Machine::~Machine()
         delete pair.second;
     }
 }
-
-void Machine::tick()
-{
-    cpu_mutex.lock();
-    z80_run(&cpu, 1);
-    cpu_mutex.unlock();
-}
