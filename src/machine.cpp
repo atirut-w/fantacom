@@ -1,7 +1,7 @@
 #include <machine.hpp>
 #include <iostream>
 #include <iomanip>
-#include <io_devices/mmu_controller.hpp>
+#include <io_devices/mmu.hpp>
 
 using namespace std;
 
@@ -9,13 +9,13 @@ uint8_t read(void *ctx, uint16_t addr)
 {
     Machine &machine = *(Machine *)ctx;
     
-    if (addr < machine.rom.size() && (machine.mmu_flags & Machine::ROM_ENABLE))
+    if (addr < machine.rom.size() && (machine.mmu->registers.flags & MMU::ROM_ENABLE))
     {
         return machine.rom[addr];
     }
 
     // Resolve physical address
-    int page = machine.pagetable[addr >> 12];
+    int page = machine.mmu->registers.pagetable[addr >> 12];
     int physical = (page << 12) | (addr & 0xfff);
 
     if (physical >= machine.ram.size())
@@ -32,7 +32,7 @@ void write(void *ctx, uint16_t addr, uint8_t val)
     Machine &machine = *(Machine *)ctx;
 
     // Resolve physical address
-    int page = machine.pagetable[addr >> 12];
+    int page = machine.mmu->registers.pagetable[addr >> 12];
     int physical = (page << 12) | (addr & 0xfff);
 
     if (physical >= machine.ram.size())
@@ -99,8 +99,9 @@ Machine::Machine()
     cpu.nmia = nullptr;
 #endif
 
-    mmu_flags = ROM_ENABLE;
-    io_devices[0] = new MMUController(this);
+    mmu = new MMU();
+
+    io_devices[0] = mmu;
     // io_devices[0x20] = new DisplayKeyboardController(this);
 }
 
