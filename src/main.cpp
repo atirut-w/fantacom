@@ -22,9 +22,9 @@ int main(int argc, char *argv[])
         .default_value(4)
         .scan<'i', int>();
     
-    // Approx. CPU frequency in MHz
+    // Target CPU frequency in MHz
     parser.add_argument("-f", "--frequency")
-        .help("CPU frequency in MHz")
+        .help("Target CPU frequency in MHz")
         .default_value(1)
         .scan<'i', int>();
 
@@ -65,17 +65,15 @@ int main(int argc, char *argv[])
 
     while (!WindowShouldClose())
     {
-        int target = (frequency * 1000000) * GetFrameTime();
+        int target = frequency * 1000000 * GetFrameTime();
         int cycles_ran = z80_run(&machine.cpu, target - runover);
         runover = cycles_ran - target;
-
-        cout << "Ran " << dec << cycles_ran << " cycles (ran over by " << runover << ")" << endl;
         
         BeginDrawing();
         ClearBackground(BLACK);
         EndDrawing();
 
-        SetWindowTitle(("Fantacom - Running at " + to_string(GetFPS()) + " FPS").c_str());
+        SetWindowTitle(("Fantacom - " + to_string(GetFPS()) + " FPS - " + to_string(cycles_ran / GetFrameTime() / 1000000) + " MHz").c_str());
     }
 
     return 0;
