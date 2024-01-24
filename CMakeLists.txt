@@ -13,6 +13,7 @@ add_subdirectory("3rd/Z80")
 
 add_subdirectory("3rd/argparse")
 add_subdirectory("3rd/raylib")
+add_subdirectory("z80core") # New core. Will replace the third party one when it's ready
 
 add_executable("fantacom"
     "src/main.cpp"
@@ -25,4 +26,4 @@ add_executable("fantacom"
     "src/io_devices/disk_ctrl.cpp"
 )
 target_include_directories("fantacom" PRIVATE "include")
-target_link_libraries("fantacom" "Z80" "argparse" "raylib")
+target_link_libraries("fantacom" "Z80" "argparse" "raylib" "z80core")
