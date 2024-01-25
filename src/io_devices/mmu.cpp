@@ -1,5 +1,8 @@
 #include <io_devices/mmu.hpp>
-#include <machine.hpp>
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
 
 MMU::MMU()
 {
@@ -11,8 +14,6 @@ MMU::MMU()
 
 uint8_t MMU::in(uint16_t addr)
 {
-    Machine &machine = *(Machine *)ctx;
-
     if (addr < sizeof(registers))
     {
         return ((uint8_t *)&registers)[addr];
@@ -22,10 +23,41 @@ uint8_t MMU::in(uint16_t addr)
 
 void MMU::out(uint16_t addr, uint8_t val)
 {
-    Machine &machine = *(Machine *)ctx;
-
     if (addr < sizeof(registers))
     {
         ((uint8_t *)&registers)[addr] = val;
     }
+}
+
+uint8_t MMU::read(uint16_t addr)
+{
+    if (addr < rom->size() && (registers.flags & ROM_ENABLE))
+    {
+        return (*rom)[addr];
+    }
+
+    int page = registers.pagetable[addr >> 12];
+    int physical = (page << 12) | (addr & 0xfff);
+
+    if (physical >= ram->size())
+    {
+        cerr << "WARN: Out of bounds read at $" << hex << addr << " -> $" << physical << endl;
+        return 0;
+    }
+
+    return (*ram)[physical];
+}
+
+void MMU::write(uint16_t addr, uint8_t val)
+{
+    int page = registers.pagetable[addr >> 12];
+    int physical = (page << 12) | (addr & 0xfff);
+
+    if (physical >= ram->size())
+    {
+        cerr << "WARN: Out of bounds write at $" << hex << addr << " -> $" << physical << endl;
+        return;
+    }
+
+    (*ram)[physical] = val;
 }
