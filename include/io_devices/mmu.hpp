@@ -6,8 +6,8 @@ class MMU : public IODevice
 {
 public:
     MMU();
-    uint8_t read(uint16_t addr) override;
-    void write(uint16_t addr, uint8_t val) override;
+    uint8_t in(uint16_t addr) override;
+    void out(uint16_t addr, uint8_t val) override;
 
     enum Flags
     {

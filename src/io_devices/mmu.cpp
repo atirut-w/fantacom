@@ -9,7 +9,7 @@ MMU::MMU()
     registers.flags |= ROM_ENABLE;
 }
 
-uint8_t MMU::read(uint16_t addr)
+uint8_t MMU::in(uint16_t addr)
 {
     Machine &machine = *(Machine *)ctx;
 
@@ -20,7 +20,7 @@ uint8_t MMU::read(uint16_t addr)
     return 0;
 }
 
-void MMU::write(uint16_t addr, uint8_t val)
+void MMU::out(uint16_t addr, uint8_t val)
 {
     Machine &machine = *(Machine *)ctx;
 

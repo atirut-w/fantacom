@@ -57,7 +57,7 @@ uint8_t in(void *ctx, uint16_t port)
         
         if (actual_port >= pair.first && actual_port < end)
         {
-            return device->read(actual_port - pair.first);
+            return device->in(actual_port - pair.first);
         }
     }
 
@@ -77,7 +77,7 @@ void out(void *ctx, uint16_t port, uint8_t val)
         
         if (actual_port >= pair.first && actual_port < end)
         {
-            device->write(actual_port - pair.first, val);
+            device->out(actual_port - pair.first, val);
             return;
         }
     }
