@@ -6,6 +6,31 @@
 #include <raylib.h>
 #include <memory>
 
+void cpu_thread(int frequency, Machine *machine)
+{
+    int waste = 0;
+
+    std::cout << "CPU thread started" << std::endl;
+    while (!WindowShouldClose())
+    {
+        if (waste > 0)
+        {
+            waste--;
+            continue;
+        }
+
+        auto current_time = std::chrono::high_resolution_clock::now();
+
+        machine->mutex.lock();
+        waste = z80_run(&machine->cpu, 1); // 1 instruction
+        machine->mutex.unlock();
+
+        auto delta = std::chrono::high_resolution_clock::now() - current_time;
+        std::this_thread::sleep_for(std::chrono::seconds((long)(1.0 / frequency)) - delta);
+    }
+    std::cout << "CPU thread stopped" << std::endl;
+}
+
 std::shared_ptr<const argparse::ArgumentParser> parse_args(int argc, char *argv[])
 {
     auto parser = std::make_shared<argparse::ArgumentParser>("fantacom");
@@ -66,21 +91,22 @@ int main(int argc, char *argv[])
 
     InitWindow(640, 480, "Fantacom - Initialising...");
     SetTargetFPS(60);
-    int frequency = parser->get<int>("--frequency");
-    int runover = 0; // The CPU is instruction-stepped, so we need to keep track of how many cycles we've run over by
+    std::thread cpu(cpu_thread, parser->get<int>("--frequency") * 1000000, &machine);
 
     while (!WindowShouldClose())
     {
-        int target = frequency * 1000000 * GetFrameTime();
-        int cycles_ran = z80_run(&machine.cpu, target - runover);
-        runover = cycles_ran - target;
-
         BeginDrawing();
         ClearBackground(BLACK);
         EndDrawing();
 
-        SetWindowTitle(("Fantacom - " + std::to_string(GetFPS()) + " FPS - " + std::to_string(cycles_ran / GetFrameTime() / 1000000) + " MHz").c_str());
+        SetWindowTitle(("Fantacom - " + std::to_string(GetFPS()) + " FPS").c_str());
     }
+
+    std::cout << "Joining CPU thread..." << std::endl;
+    cpu.join();
+    std::cout << "CPU thread joined" << std::endl;
+
+    CloseWindow();
 
     return 0;
 }
