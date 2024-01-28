@@ -13,11 +13,10 @@ public:
     Z80 cpu;
     std::array<uint8_t, 0x2000> rom;
     std::vector<uint8_t> ram;
-
-    std::map<uint16_t, IODevice*> io_devices;
-    
     MMU *mmu;
-    
+
+    std::map<uint16_t, IODevice *> io_devices;
+
     Machine();
     ~Machine();
     void tick();
