@@ -41,8 +41,6 @@ std::shared_ptr<const argparse::ArgumentParser> parse_args(int argc, char *argv[
     return parser;
 }
 
-using namespace std;
-
 int main(int argc, char *argv[])
 {
     auto parser = parse_args(argc, argv);
@@ -51,16 +49,16 @@ int main(int argc, char *argv[])
     machine.ram.resize(parser->get<int>("--ram") * 0x1000);
 
     {
-        ifstream bootrom(parser->get<string>("bootrom"), ios::binary);
+        std::ifstream bootrom(parser->get<std::string>("bootrom"), std::ios::binary);
 
         if (!bootrom)
         {
-            cerr << "Could not open boot ROM image" << endl;
+            std::cerr << "Could not open boot ROM image" << std::endl;
             exit(1);
         }
-        if (filesystem::file_size(parser->get<string>("bootrom")) > machine.rom.size())
+        if (std::filesystem::file_size(parser->get<std::string>("bootrom")) > machine.rom.size())
         {
-            cerr << "WARN: Boot ROM image too large, truncating" << endl;
+            std::cerr << "WARN: Boot ROM image too large, truncating" << std::endl;
         }
 
         bootrom.read((char *)machine.rom.data(), machine.rom.size());
@@ -81,7 +79,7 @@ int main(int argc, char *argv[])
         ClearBackground(BLACK);
         EndDrawing();
 
-        SetWindowTitle(("Fantacom - " + to_string(GetFPS()) + " FPS - " + to_string(cycles_ran / GetFrameTime() / 1000000) + " MHz").c_str());
+        SetWindowTitle(("Fantacom - " + std::to_string(GetFPS()) + " FPS - " + std::to_string(cycles_ran / GetFrameTime() / 1000000) + " MHz").c_str());
     }
 
     return 0;
