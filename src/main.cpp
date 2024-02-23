@@ -13,17 +13,18 @@ void cpu_thread(int frequency, Machine *machine)
     std::cout << "CPU thread started" << std::endl;
     while (!WindowShouldClose())
     {
+        auto current_time = std::chrono::high_resolution_clock::now();
+
         if (waste > 0)
         {
             waste--;
-            continue;
         }
-
-        auto current_time = std::chrono::high_resolution_clock::now();
-
-        machine->mutex.lock();
-        waste = z80_run(&machine->cpu, 1); // 1 instruction
-        machine->mutex.unlock();
+        else
+        {
+            machine->mutex.lock();
+            waste = z80_run(&machine->cpu, 1); // 1 instruction
+            machine->mutex.unlock();
+        }
 
         auto delta = std::chrono::high_resolution_clock::now() - current_time;
         std::this_thread::sleep_for(std::chrono::seconds((long)(1.0 / frequency)) - delta);
