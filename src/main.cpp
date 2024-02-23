@@ -22,7 +22,7 @@ void cpu_thread(int frequency, Machine *machine)
         else
         {
             machine->mutex.lock();
-            waste = z80_run(&machine->cpu, 1); // 1 instruction
+            waste = z80_run(&machine->cpu, 1) - 1; // -1 because this counts as the first cycle of the instruction
             machine->mutex.unlock();
         }
 
