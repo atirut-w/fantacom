@@ -14,19 +14,19 @@ std::shared_ptr<const argparse::ArgumentParser> parse_args(int argc, char *argv[
     // Boot ROM image
     parser->add_argument("bootrom")
         .help("Boot ROM image");
-    
+
     // How many banks of 4KiB RAM to allocate
     parser->add_argument("-r", "--ram")
         .help("Number of 4KiB RAM banks to allocate")
         .default_value(4)
         .scan<'i', int>();
-    
+
     // Target CPU frequency in MHz
     parser->add_argument("-f", "--frequency")
         .help("Target CPU frequency in MHz")
         .default_value(1)
         .scan<'i', int>();
-    
+
     try
     {
         parser->parse_args(argc, argv);
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
         int target = frequency * 1000000 * GetFrameTime();
         int cycles_ran = z80_run(&machine.cpu, target - runover);
         runover = cycles_ran - target;
-        
+
         BeginDrawing();
         ClearBackground(BLACK);
         EndDrawing();

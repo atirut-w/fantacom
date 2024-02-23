@@ -19,13 +19,13 @@ void write(void *ctx, uint16_t addr, uint8_t val)
 uint8_t in(void *ctx, uint16_t port)
 {
     Machine &machine = *(Machine *)ctx;
-    
+
     for (auto &pair : machine.io_devices)
     {
         IODevice *device = pair.second;
         uint16_t end = pair.first + device->size;
         uint16_t actual_port = device->lsb_only ? port & 0xff : port;
-        
+
         if (actual_port >= pair.first && actual_port < end)
         {
             return device->in(actual_port - pair.first);
@@ -39,13 +39,13 @@ uint8_t in(void *ctx, uint16_t port)
 void out(void *ctx, uint16_t port, uint8_t val)
 {
     Machine &machine = *(Machine *)ctx;
-    
+
     for (auto &pair : machine.io_devices)
     {
         IODevice *device = pair.second;
         uint16_t end = pair.first + device->size;
         uint16_t actual_port = device->lsb_only ? port & 0xff : port;
-        
+
         if (actual_port >= pair.first && actual_port < end)
         {
             device->out(actual_port - pair.first, val);
