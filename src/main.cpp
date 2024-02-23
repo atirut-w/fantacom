@@ -5,13 +5,16 @@
 #include <filesystem>
 #include <raylib.h>
 #include <memory>
+#include <atomic>
+
+std::atomic_bool running = true;
 
 void cpu_thread(int frequency, Machine *machine)
 {
     int waste = 0;
 
     std::cout << "CPU thread started" << std::endl;
-    while (!WindowShouldClose())
+    while (running)
     {
         auto current_time = std::chrono::high_resolution_clock::now();
 
@@ -103,9 +106,8 @@ int main(int argc, char *argv[])
         SetWindowTitle(("Fantacom - " + std::to_string(GetFPS()) + " FPS").c_str());
     }
 
-    std::cout << "Joining CPU thread..." << std::endl;
+    running = false;
     cpu.join();
-    std::cout << "CPU thread joined" << std::endl;
 
     CloseWindow();
 
