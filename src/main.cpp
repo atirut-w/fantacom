@@ -16,8 +16,6 @@ void cpu_thread(int frequency, Machine *machine)
     std::cout << "CPU thread started" << std::endl;
     while (running)
     {
-        auto current_time = std::chrono::high_resolution_clock::now();
-
         if (waste > 0)
         {
             waste--;
@@ -29,8 +27,7 @@ void cpu_thread(int frequency, Machine *machine)
             machine->mutex.unlock();
         }
 
-        auto delta = std::chrono::high_resolution_clock::now() - current_time;
-        std::this_thread::sleep_for(std::chrono::seconds((long)(1.0 / frequency)) - delta);
+        std::this_thread::sleep_for(std::chrono::seconds((long)(1.0 / frequency)));
     }
     std::cout << "CPU thread stopped" << std::endl;
 }
