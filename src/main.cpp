@@ -98,6 +98,17 @@ int main(int argc, char *argv[])
     {
         BeginDrawing();
         ClearBackground(BLACK);
+
+        machine->mutex.lock();
+        for (int x = 0; x < 80; x++)
+        {
+            for (int y = 0; y < 25; y++)
+            {
+                DrawText(std::string(1, machine->ram[y * 80 + x]).c_str(), x * 8, y * 8, 8, WHITE);
+            }
+        }
+        machine->mutex.unlock();
+
         EndDrawing();
 
         SetWindowTitle(("Fantacom - " + std::to_string(GetFPS()) + " FPS").c_str());
