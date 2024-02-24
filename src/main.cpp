@@ -9,7 +9,7 @@
 
 std::atomic_bool running = true;
 
-void cpu_thread(int frequency, Machine *machine)
+void cpu_thread(int frequency, std::shared_ptr<Machine> machine)
 {
     int waste = 0;
 
@@ -71,8 +71,8 @@ int main(int argc, char *argv[])
 {
     auto parser = parse_args(argc, argv);
 
-    Machine machine;
-    machine.ram.resize(parser->get<int>("--ram") * 0x1000);
+    std::shared_ptr<Machine> machine = std::make_shared<Machine>();
+    machine->ram.resize(parser->get<int>("--ram") * 0x1000);
 
     {
         std::ifstream bootrom(parser->get<std::string>("bootrom"), std::ios::binary);
@@ -82,17 +82,17 @@ int main(int argc, char *argv[])
             std::cerr << "Could not open boot ROM image" << std::endl;
             exit(1);
         }
-        if (std::filesystem::file_size(parser->get<std::string>("bootrom")) > machine.rom.size())
+        if (std::filesystem::file_size(parser->get<std::string>("bootrom")) > machine->rom.size())
         {
             std::cerr << "WARN: Boot ROM image too large, truncating" << std::endl;
         }
 
-        bootrom.read((char *)machine.rom.data(), machine.rom.size());
+        bootrom.read((char *)machine->rom.data(), machine->rom.size());
     }
 
     InitWindow(640, 480, "Fantacom - Initialising...");
     SetTargetFPS(60);
-    std::thread cpu(cpu_thread, parser->get<int>("--frequency") * 1000000, &machine);
+    std::thread cpu(cpu_thread, parser->get<int>("--frequency") * 1000000, machine);
 
     while (!WindowShouldClose())
     {
