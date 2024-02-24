@@ -6,6 +6,7 @@
 #include <io_device.hpp>
 #include <io_devices/mmu.hpp>
 #include <map>
+#include <mutex>
 
 class Machine
 {
@@ -16,6 +17,7 @@ public:
     MMU *mmu;
 
     std::map<uint16_t, IODevice *> io_devices;
+    std::mutex mutex;
 
     Machine();
     ~Machine();
