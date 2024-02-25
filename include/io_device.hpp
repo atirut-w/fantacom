@@ -6,7 +6,6 @@ class IODevice
 public:
     void *ctx;
     uint8_t size;
-    bool lsb_only;
 
     // IODevice(void *ctx) : ctx(ctx) {};
     virtual uint8_t in(uint16_t addr) = 0;

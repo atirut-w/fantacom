@@ -7,8 +7,6 @@ using namespace std;
 MMU::MMU()
 {
     size = sizeof(registers);
-    lsb_only = true;
-
     registers.flags |= ROM_ENABLE;
 }
 

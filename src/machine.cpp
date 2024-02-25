@@ -24,11 +24,10 @@ uint8_t in(void *ctx, uint16_t port)
     {
         IODevice *device = pair.second;
         uint16_t end = pair.first + device->size;
-        uint16_t actual_port = device->lsb_only ? port & 0xff : port;
 
-        if (actual_port >= pair.first && actual_port < end)
+        if (port >= pair.first && port < end)
         {
-            return device->in(actual_port - pair.first);
+            return device->in(port - pair.first);
         }
     }
 
@@ -44,11 +43,10 @@ void out(void *ctx, uint16_t port, uint8_t val)
     {
         IODevice *device = pair.second;
         uint16_t end = pair.first + device->size;
-        uint16_t actual_port = device->lsb_only ? port & 0xff : port;
 
-        if (actual_port >= pair.first && actual_port < end)
+        if (port >= pair.first && port < end)
         {
-            device->out(actual_port - pair.first, val);
+            device->out(port - pair.first, val);
             return;
         }
     }
