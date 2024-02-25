@@ -67,9 +67,10 @@ Machine::Machine()
     mmu = new MMU();
     mmu->rom = &rom;
     mmu->ram = &ram;
-
     io_devices[0] = mmu;
-    // io_devices[0x20] = new DisplayKeyboardController(this);
+
+    graphics = new Graphics();
+    io_devices[0x0100] = graphics;
 }
 
 Machine::~Machine()
