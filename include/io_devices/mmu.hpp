@@ -23,7 +23,7 @@ public:
 
     struct
     {
-        uint8_t flags;
         uint8_t pagetable[16];
+        uint8_t flags;
     } registers;
 };
