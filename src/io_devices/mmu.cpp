@@ -39,7 +39,7 @@ uint8_t MMU::read(uint16_t addr)
 
     if (physical >= ram->size())
     {
-        cerr << "WARN: Out of bounds read at $" << hex << addr << " -> $" << physical << endl;
+        // cerr << "WARN: Out of bounds read at $" << hex << addr << " -> $" << physical << endl;
         return 0;
     }
 
@@ -53,7 +53,7 @@ void MMU::write(uint16_t addr, uint8_t val)
 
     if (physical >= ram->size())
     {
-        cerr << "WARN: Out of bounds write at $" << hex << addr << " -> $" << physical << endl;
+        // cerr << "WARN: Out of bounds write at $" << hex << addr << " -> $" << physical << endl;
         return;
     }
 
