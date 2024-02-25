@@ -13,6 +13,26 @@
 
 std::atomic_bool running = true;
 
+// Bog-standard VGA palette
+Color palette[16] = {
+    {0,0,0,255}, // Black
+    {0,0,170,255}, // Blue
+    {0,170,0,255}, // Green
+    {0,170,170,255}, // Cyan
+    {170,0,0,255}, // Red
+    {170,0,170,255}, // Magenta
+    {170,85,0,255}, // Brown
+    {170,170,170,255}, // Light Gray
+    {85,85,85,255}, // Dark Gray
+    {85,85,255,255}, // Light Blue
+    {85,255,85,255}, // Light Green
+    {85,255,255,255}, // Light Cyan
+    {255,85,85,255}, // Light Red
+    {255,85,255,255}, // Light Magenta
+    {255,255,85,255}, // Yellow
+    {255,255,255,255} // White
+};
+
 void cpu_thread(int frequency, std::shared_ptr<Machine> machine)
 {
     int waste = 0;
@@ -157,14 +177,15 @@ int main(int argc, char *argv[])
     std::thread cpu(cpu_thread, parser->get<int>("--frequency") * 1000000, machine);
     while (!WindowShouldClose())
     {
-        std::array<uint8_t, SCREEN_WIDTH * SCREEN_HEIGHT> screen;
+        std::array<Character, SCREEN_WIDTH * SCREEN_HEIGHT> screen;
 
         machine->mutex.lock();
         {
-            uint16_t screen_offset = machine->graphics->registers.txt_page << 8;
+            uint16_t screen_offset = machine->graphics->registers.buffer_page << 8;
             for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++)
             {
-                screen[i] = machine->mmu->read(screen_offset + i);
+                screen[i].attributes = machine->mmu->read(screen_offset++);
+                screen[i].character = machine->mmu->read(screen_offset++);
             }
         }
         machine->mutex.unlock();
@@ -173,8 +194,9 @@ int main(int argc, char *argv[])
         ClearBackground(BLACK);
         for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++)
         {
-            int character = screen[i];
-            DrawTexturePro(font_textures[character], {0, 0, 8, 16}, {(float)(i % SCREEN_WIDTH) * 8, (float)(i / SCREEN_WIDTH) * 16, 8, 16}, {0, 0}, 0, {170, 170, 170, 255});
+            Character character = screen[i];
+            DrawRectangle((i % SCREEN_WIDTH) * 8, (i / SCREEN_WIDTH) * 16, 8, 16, palette[(character.attributes >> 4) & 0x07]);
+            DrawTexturePro(font_textures[character.character], {0, 0, 8, 16}, {(float)(i % SCREEN_WIDTH) * 8, (float)(i / SCREEN_WIDTH) * 16, 8, 16}, {0, 0}, 0, palette[character.attributes & 0x0f]);
         }
         EndTextureMode();
 
