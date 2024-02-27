@@ -3,31 +3,22 @@ CC = zcc
 AS = z88dk-z80asm
 
 BUILD_DIR = build
-OBJ_DIR = $(BUILD_DIR)/o
 SRC_DIR = src
 
-CFLAGS = +z80 -clib=classic -I$(SRC_DIR)/include
+CFLAGS = +z80 -clib=classic -I$(SRC_DIR)/include -crt0=crt0.asm
 
-.PHONY: configure clean
-runtime: runtime/l_gchar.o
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+
+.PHONY: configure build clean
 
 configure:
 	@echo "Configuring build environment..."
 	@mkdir -p $(BUILD_DIR)
-	@mkdir -p $(OBJ_DIR)
-
-build: crt0.o main.o z80io.o display.o
-	@echo "Linking bootrom..."
-	@$(AS) -b -o$(BUILD_DIR)/bootrom.bin $(OBJ_DIR)/*.o
 
 clean:
 	@echo "Cleaning build environment..."
 	@find $(BUILD_DIR) -type f -delete
 
-%.o: $(SRC_DIR)/%.c
-	@echo "Compiling $<..."
-	@$(CC) $(CFLAGS) -o $(OBJ_DIR)/$@ -c $<
-
-%.o: $(SRC_DIR)/%.asm
-	@echo "Assembling $<..."
-	@$(AS) -o$(OBJ_DIR)/$@ $<
+build: src
+	@echo "Building bootrom..."
+	@$(CC) $(CFLAGS) -o$(BUILD_DIR)/bootrom.bin $(SRCS) -create-app -m
