@@ -1,8 +1,20 @@
 #include <z80io.h>
 
-int in_port(int port) __naked
+char in_port(int port) __naked
 {
 __asm
+    pop de ; Return address
+    pop bc ; Port
+    
+    push af ; Save flags
+    in a, (c)
+    ld h, 0
+    ld l, a
+    pop af ; Restore flags
+
+    push bc ; Restore registers
+    push de
+    ret
 __endasm;
 }
 
