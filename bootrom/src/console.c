@@ -11,6 +11,38 @@ typedef struct
 volatile Character *screen = (Character *)0x3000;
 int cursor = 0;
 
+void scroll_line() __naked
+{
+__asm
+    ld bc, 80 * 24 * 2
+    ld de, 0x3000
+    ld hl, 0x3000 + (80 * 2)
+    ldir
+
+    ld bc, 80 * 2
+    ld de, 0x3000 + (80 * 24 * 2) + 1
+    ld hl, 0x3000 + (80 * 24 * 2)
+    ld (hl), 0
+    ldir
+
+    ret
+__endasm;
+}
+
+void scroll_char() __naked
+{
+__asm
+    ld bc, (80 * 25 * 2) - 2
+    ld de, 0x3000
+    ld hl, 0x3002
+    ldir
+    dec hl
+    ld (hl), 0
+
+    ret
+__endasm;
+}
+
 int fputc_cons_native(char c)
 {
     switch (c)
@@ -18,13 +50,20 @@ int fputc_cons_native(char c)
     default:
         screen[cursor].character = c;
         screen[cursor].attribute = 0x07;
-        cursor++;
+        
+        if (cursor + 1 >= 80 * 25)
+            scroll_char();
+        else
+            cursor++;
         break;
     case '\r':
         cursor -= cursor % 80;
-        break;
+        break; // TODO: Consider fall-through to '\n'
     case '\n':
-        cursor += 80;
+        if (cursor + 80 >= 80 * 25)
+            scroll_line();
+        else
+            cursor += 80;
         break;
     }
 }
