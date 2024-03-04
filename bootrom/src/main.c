@@ -5,14 +5,16 @@ int display_init()
 {
     // Find a memory bank for our VGA buffer
     // NOTE: We can continue on from the bank we used as RAM
-    volatile char *test_ptr = (char*)0x3000;
-    for (uint8_t i = in_port(2) + 1; i != 0; i++)
+    volatile char *test_ptr = (char *)0x3000;
+    uint8_t bank = in_port(2) + 1;
+    do
     {
         *test_ptr = 0x55;
         if (*test_ptr == 0x55)
             break;
-        out_port(3, i);
-    }
+        out_port(3, bank++);
+    } while (bank != 0);
+
     if (in_port(3) == 0)
         return -1; // Checked all banks, no luck
 
