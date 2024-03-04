@@ -1,5 +1,6 @@
 #include <z80io.h>
 #include <stdio.h>
+#include <string.h>
 
 int display_init()
 {
@@ -23,13 +24,35 @@ int display_init()
     return 0;
 }
 
+int memcheck()
+{
+    volatile char *test_ptr = (char *)0x4000;
+    uint8_t bank = in_port(3) + 1;
+    int total = 8;
+
+    printf("Performing memory check...\n");
+    do
+    {
+        out_port(4, bank++);
+        *test_ptr = 0x55;
+        if (*test_ptr == 0x55)
+        {
+            total += 4;
+            printf("\r%4d KiB", total);
+        }
+    } while (bank != 0);
+    printf(" OK\n");
+
+    return total;
+}
+
 int main()
 {
     if (display_init() != 0)
         return -1;
     
-    printf("Hello, World from C on the Z80!\r\n");
-    printf("Here's another line.\r\n");
-    
+    printf("FantaCom Boot ROM (C) Atirut Wattanamongkol & contributors\n\n");
+    memcheck();
+
     return 0;
 }
