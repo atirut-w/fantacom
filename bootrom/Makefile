@@ -21,7 +21,7 @@ clean:
 	@echo "Cleaning build environment..."
 	@find $(BUILD_DIR) -type f -delete
 
-build: main.o z80io.o display.o
+build: main.o z80io.o console.o
 	@echo "Linking..."
 	@$(CC) $(LFLAGS) -o$(BUILD_DIR)/bootrom.bin $(patsubst %.o, $(OBJ_DIR)/%.o, $^)
 	@echo "Concatenating DATA..."
