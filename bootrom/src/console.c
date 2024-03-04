@@ -36,7 +36,7 @@ int fputc_cons_native(char c)
     default:
         screen[cursor].character = c;
         screen[cursor].attribute = 0x07;
-        
+
         if (cursor + 1 >= 80 * 25)
         {
             scroll_line();
