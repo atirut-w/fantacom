@@ -7,7 +7,7 @@ OBJ_DIR = $(BUILD_DIR)/obj
 SRC_DIR = src
 
 CFLAGS = +z80 -clib=classic -I$(SRC_DIR)/include -c
-LFLAGS = +z80 -clib=classic -crt0=crt0.asm
+LFLAGS = +z80 -clib=classic -crt0=crt0.asm -m
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 
