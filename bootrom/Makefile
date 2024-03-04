@@ -26,6 +26,8 @@ clean:
 build: main.o z80io.o display.o
 	@echo "Linking..."
 	@$(CC) $(LFLAGS) -o$(BUILD_DIR)/bootrom.bin $(patsubst %.o, $(OBJ_DIR)/%.o, $^)
+	@echo "Concatenating DATA..."
+	@cat $(BUILD_DIR)/bootrom_DATA.bin >> $(BUILD_DIR)/bootrom.bin
 
 %.o: $(SRC_DIR)/%.c
 	@echo "Compiling $@..."
