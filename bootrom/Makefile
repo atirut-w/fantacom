@@ -10,8 +10,6 @@ CFLAGS = +z80 -clib=classic -I$(SRC_DIR)/include -c
 CRT_OPTS = CRT_ORG_BSS=0x2000 REGISTER_SP=0x3000
 LFLAGS = +z80 -clib=classic -crt0=crt0.asm $(addprefix -pragma-define:, $(CRT_OPTS)) -m
 
-SRCS = $(wildcard $(SRC_DIR)/*.c)
-
 .PHONY: configure build clean
 
 configure:
@@ -30,9 +28,9 @@ build: main.o z80io.o display.o
 	@cat $(BUILD_DIR)/bootrom_DATA.bin >> $(BUILD_DIR)/bootrom.bin
 
 %.o: $(SRC_DIR)/%.c
-	@echo "Compiling $@..."
+	@echo "Compiling $<..."
 	@$(CC) $(CFLAGS) -o$(OBJ_DIR)/$@ $<
 
 %.o: $(SRC_DIR)/%.asm
-	@echo "Assembling $@..."
+	@echo "Assembling $<..."
 	@$(AS) -o$(OBJ_DIR)/$@ $<
