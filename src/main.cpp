@@ -149,6 +149,10 @@ int main(int argc, char *argv[])
 
     std::shared_ptr<Machine> machine = std::make_shared<Machine>();
     machine->ram.resize(parser->get<int>("--ram") * 0x1000);
+    for (int i = 0; i < machine->ram.size(); i++)
+    {
+        machine->ram[i] = i & 1 ? '@' : 0x19;
+    }
 
     {
         std::ifstream bootrom(parser->get<std::string>("bootrom"), std::ios::binary);
