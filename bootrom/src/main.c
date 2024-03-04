@@ -18,6 +18,7 @@ int display_init()
     if (in_port(3) == 0)
         return -1; // Checked all banks, no luck
 
+    memset((void *)test_ptr, 0, 80 * 25 * 2);
     out_port(0x0100, 0x30); // Set VGA buffer to 0x3000
     return 0;
 }
