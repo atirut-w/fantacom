@@ -1,6 +1,7 @@
 #include <z80io.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 typedef struct
 {
@@ -11,22 +12,12 @@ typedef struct
 volatile Character *screen = (Character *)0x3000;
 int cursor = 0;
 
-void scroll_line() __naked
+void scroll_line()
 {
-__asm
-    ld bc, 80 * 24 * 2
-    ld de, 0x3000
-    ld hl, 0x3000 + (80 * 2)
-    ldir
-
-    ld bc, 80 * 2
-    ld de, 0x3000 + (80 * 24 * 2) + 1
-    ld hl, 0x3000 + (80 * 24 * 2)
-    ld (hl), 0
-    ldir
-
-    ret
-__endasm;
+    char *screen_ptr = (char *)0x3000;
+    
+    memcpy(screen_ptr, screen_ptr + (80 * 2), 80 * 24 * 2);
+    memset(screen_ptr + (80 * 24 * 2), 0, 80 * 2);
 }
 
 int fputc_cons_native(char c)
