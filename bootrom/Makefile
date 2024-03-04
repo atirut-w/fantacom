@@ -7,7 +7,8 @@ OBJ_DIR = $(BUILD_DIR)/obj
 SRC_DIR = src
 
 CFLAGS = +z80 -clib=classic -I$(SRC_DIR)/include -c
-LFLAGS = +z80 -clib=classic -crt0=crt0.asm -m
+CRT_OPTS = CRT_ORG_BSS=0x2000 REGISTER_SP=0x3000
+LFLAGS = +z80 -clib=classic -crt0=crt0.asm $(addprefix -pragma-define:, $(CRT_OPTS)) -m
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 
