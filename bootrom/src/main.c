@@ -9,10 +9,10 @@ int display_init()
     uint8_t bank = in_port(2) + 1;
     do
     {
+        out_port(3, bank++);
         *test_ptr = 0x55;
         if (*test_ptr == 0x55)
             break;
-        out_port(3, bank++);
     } while (bank != 0);
 
     if (in_port(3) == 0)
