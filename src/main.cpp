@@ -171,6 +171,8 @@ int main(int argc, char *argv[])
     }
 
     std::ifstream font_file("font.hex");
+    if (!font_file)
+        throw std::runtime_error("Failed to open font file");
     Unifont::Font font(font_file);
 
     InitWindow(SCREEN_WIDTH * 8 * 2, SCREEN_HEIGHT * 16 * 2, "Fantacom - Initializing...");
