@@ -22,11 +22,11 @@ void scroll_line()
 
 int fputc_cons_native(char c)
 {
+    screen[cursor].attribute = 0x07;
     switch (c)
     {
     default:
         screen[cursor].character = c;
-        screen[cursor].attribute = 0x07;
 
         if (cursor + 1 >= 80 * 25)
         {
@@ -47,5 +47,6 @@ int fputc_cons_native(char c)
         cursor -= cursor % 80;
         break;
     }
+    screen[cursor].attribute = 0x70;
     return c;
 }
