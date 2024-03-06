@@ -52,6 +52,23 @@ void out(void *ctx, uint16_t port, uint8_t val)
     }
 }
 
+uint8_t int_ack(void *ctx, uint16_t address)
+{
+    Machine &machine = *(Machine *)ctx;
+    z80_int(&machine.cpu, 0);
+    
+    if (machine.interrupt_data.size() > 0)
+    {
+        auto value = machine.interrupt_data[0];
+        machine.interrupt_data.erase(machine.interrupt_data.begin());
+        return value;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 Machine::Machine()
 {
     std::memset(&cpu, 0, sizeof(cpu)); // TODO: Z80 core as a C++ library and not C
@@ -63,6 +80,8 @@ Machine::Machine()
     cpu.write = write;
     cpu.in = in;
     cpu.out = out;
+    cpu.inta = int_ack;
+    cpu.int_fetch = int_ack;
 
     mmu = std::make_shared<MMU>();
     mmu->rom = &rom;
@@ -71,4 +90,15 @@ Machine::Machine()
 
     graphics = std::make_shared<Graphics>();
     io_devices[0x0100] = graphics;
+}
+
+void Machine::interrupt(std::vector<uint8_t> &data)
+{
+    interrupt_data = data;
+    z80_int(&cpu, 1);
+}
+
+void Machine::nmi_interrupt()
+{
+    z80_nmi(&cpu);
 }

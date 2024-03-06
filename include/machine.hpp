@@ -14,6 +14,7 @@ class Machine
 {
 public:
     Z80 cpu;
+    std::vector<uint8_t> interrupt_data;
     std::array<uint8_t, 0x2000> rom;
     std::vector<uint8_t> ram;
 
@@ -24,5 +25,7 @@ public:
     std::shared_ptr<Graphics> graphics;
 
     Machine();
+    void interrupt(std::vector<uint8_t> &data);
+    void nmi_interrupt();
     void tick();
 };
