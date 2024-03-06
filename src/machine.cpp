@@ -22,7 +22,7 @@ uint8_t in(void *ctx, uint16_t port)
 
     for (auto &pair : machine.io_devices)
     {
-        IODevice *device = pair.second;
+        auto device = pair.second;
         uint16_t end = pair.first + device->size;
 
         if (port >= pair.first && port < end)
@@ -41,7 +41,7 @@ void out(void *ctx, uint16_t port, uint8_t val)
 
     for (auto &pair : machine.io_devices)
     {
-        IODevice *device = pair.second;
+        auto device = pair.second;
         uint16_t end = pair.first + device->size;
 
         if (port >= pair.first && port < end)
@@ -64,19 +64,11 @@ Machine::Machine()
     cpu.in = in;
     cpu.out = out;
 
-    mmu = new MMU();
+    mmu = std::make_shared<MMU>();
     mmu->rom = &rom;
     mmu->ram = &ram;
     io_devices[0] = mmu;
 
-    graphics = new Graphics();
+    graphics = std::make_shared<Graphics>();
     io_devices[0x0100] = graphics;
-}
-
-Machine::~Machine()
-{
-    for (auto &pair : io_devices)
-    {
-        delete pair.second;
-    }
 }

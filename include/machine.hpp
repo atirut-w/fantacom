@@ -8,6 +8,7 @@
 #include <map>
 #include <mutex>
 #include <io_devices/graphics.hpp>
+#include <memory>
 
 class Machine
 {
@@ -16,13 +17,12 @@ public:
     std::array<uint8_t, 0x2000> rom;
     std::vector<uint8_t> ram;
 
-    std::map<uint16_t, IODevice *> io_devices;
+    std::map<uint16_t, std::shared_ptr<IODevice>> io_devices;
     std::mutex mutex;
 
-    MMU *mmu;
-    Graphics *graphics;
+    std::shared_ptr<MMU> mmu;
+    std::shared_ptr<Graphics> graphics;
 
     Machine();
-    ~Machine();
     void tick();
 };
