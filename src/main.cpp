@@ -91,9 +91,9 @@ std::shared_ptr<const argparse::ArgumentParser> parse_args(int argc, char *argv[
     return parser;
 }
 
-std::array<Texture2D, 256> generate_font_textures(const Unifont::Font &font)
+Texture2D generate_font_texture(const Unifont::Font &font)
 {
-    std::array<Texture2D, 256> textures;
+    RenderTexture2D rt = LoadRenderTexture(8 * 16, 16 * 16);
     std::array<int, 256> cp437 = {
         0x0000, 0x263a, 0x263b, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022, 0x25d8, 0x25cb, 0x25d9, 0x2642, 0x2640, 0x266a, 0x266b, 0x263c,
         0x25ba, 0x25c4, 0x2195, 0x203c, 0x00b6, 0x00a7, 0x25ac, 0x21a8, 0x2191, 0x2193, 0x2192, 0x2190, 0x221f, 0x2194, 0x25b2, 0x25bc,
@@ -114,33 +114,33 @@ std::array<Texture2D, 256> generate_font_textures(const Unifont::Font &font)
         0x2261, 0x00b1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00f7, 0x2248, 0x00b0, 0x2219, 0x00b7, 0x221a, 0x207f, 0x00b2, 0x25a0, 0x00a0,
     };
 
+    BeginTextureMode(rt);
+    ClearBackground(BLANK);
     for (int i = 0; i < 256; i++)
     {
-        Unifont::Glyph glyph = font.glyphs.at(cp437[i]);
-        RenderTexture2D rt = LoadRenderTexture(8, 16);
-
-        BeginTextureMode(rt);
-        ClearBackground(BLANK);
+        auto glyph = font.glyphs.at(i);
+        int base_x = (i & 0x0f) * 8;
+        int base_y = (i >> 4) * 16;
         for (int y = 0; y < 16; y++)
         {
+            auto row = glyph.data[y];
             for (int x = 0; x < 8; x++)
             {
-                if (glyph.data[y] & (1 << (7 - x)))
+                if (row & (1 << x))
                 {
-                    DrawPixel(x, y, WHITE);
+                    DrawPixel(base_x + (7 - x), base_y + y, WHITE);
                 }
             }
         }
-        EndTextureMode();
-
-        Image img = LoadImageFromTexture(rt.texture);
-        ImageFlipVertical(&img);
-
-        UnloadTexture(rt.texture);
-        textures[i] = LoadTextureFromImage(img);
     }
+    EndTextureMode();
 
-    return textures;
+    Image img = LoadImageFromTexture(rt.texture);
+    UnloadRenderTexture(rt);
+    ImageFlipVertical(&img);
+    Texture2D tex = LoadTextureFromImage(img);
+    UnloadImage(img);
+    return tex;
 }
 
 int main(int argc, char *argv[])
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
 
     InitWindow(SCREEN_WIDTH * 8 * 2, SCREEN_HEIGHT * 16 * 2, "Fantacom - Initializing...");
     SetTargetFPS(60);
-    auto font_textures = generate_font_textures(font);
+    auto font_texture = generate_font_texture(font);
     RenderTexture2D screen_rt = LoadRenderTexture(SCREEN_WIDTH * 8, SCREEN_HEIGHT * 16);
 
     std::thread cpu(cpu_thread, parser->get<int>("--frequency") * 1000000, machine);
@@ -202,7 +202,19 @@ int main(int argc, char *argv[])
         {
             Character character = screen[i];
             DrawRectangle((i % SCREEN_WIDTH) * 8, (i / SCREEN_WIDTH) * 16, 8, 16, palette[(character.attributes >> 4) & 0x07]);
-            DrawTexturePro(font_textures[character.character], {0, 0, 8, 16}, {(float)(i % SCREEN_WIDTH) * 8, (float)(i / SCREEN_WIDTH) * 16, 8, 16}, {0, 0}, 0, palette[character.attributes & 0x0f]);
+            Rectangle char_rect = {
+                (float)(character.character & 0x0f) * 8,
+                (float)(character.character >> 4) * 16,
+                8,
+                16
+            };
+            Rectangle dst_rect = {
+                (float)(i % SCREEN_WIDTH) * 8,
+                (float)(i / SCREEN_WIDTH) * 16,
+                8,
+                16
+            };
+            DrawTexturePro(font_texture, char_rect, dst_rect, {0, 0}, 0, palette[character.attributes & 0x0f]);
         }
         EndTextureMode();
 
