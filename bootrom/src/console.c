@@ -47,4 +47,5 @@ int fputc_cons_native(char c)
         cursor -= cursor % 80;
         break;
     }
+    return c;
 }
