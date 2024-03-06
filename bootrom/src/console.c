@@ -43,6 +43,8 @@ int fputc_cons_native(char c)
             scroll_line();
         else
             cursor += 80;
+
+        // Fall-through to `\r` to start at beginning of line
     case '\r':
         cursor -= cursor % 80;
         break;
