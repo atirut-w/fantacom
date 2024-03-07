@@ -7,7 +7,7 @@ OBJ_DIR = $(BUILD_DIR)/obj
 SRC_DIR = src
 
 CFLAGS = +z80 -clib=classic -I$(SRC_DIR)/include -c
-CRT_OPTS = CRT_ORG_BSS=0x2000 REGISTER_SP=0x3000
+CRT_OPTS = CRT_ORG_BSS=0x2000 REGISTER_SP=0x3000 CRT_ENABLE_RST=0x02
 LFLAGS = +z80 -clib=classic -crt0=crt0.asm $(addprefix -pragma-define:, $(CRT_OPTS)) -m
 
 .PHONY: configure build clean
@@ -21,7 +21,7 @@ clean:
 	@echo "Cleaning build environment..."
 	@find $(BUILD_DIR) -type f -delete
 
-build: main.o z80io.o console.o
+build: main.o z80io.o console.o interrupts.o
 	@echo "Linking..."
 	@$(CC) $(LFLAGS) -o$(BUILD_DIR)/bootrom.bin $(patsubst %.o, $(OBJ_DIR)/%.o, $^)
 	@echo "Concatenating DATA..."

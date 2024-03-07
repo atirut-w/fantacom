@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int display_init()
+int init_display()
 {
     // Find a memory bank for our VGA buffer
     // NOTE: We can continue on from the bank we used as RAM
@@ -46,10 +46,19 @@ int memcheck()
     return total;
 }
 
+void init_interrupts()
+{
+__asm
+    ei
+    ret
+__endasm;
+}
+
 int main()
 {
-    if (display_init() != 0)
+    if (init_display() != 0)
         return -1;
+    init_interrupts();
     
     printf("FantaCom Boot ROM (C) Atirut Wattanamongkol & contributors\n\n");
     memcheck();
