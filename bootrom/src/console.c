@@ -38,6 +38,10 @@ int fputc_cons_native(char c)
             cursor++;
         }
         break;
+    case '\b':
+        if (cursor > 0)
+            cursor--;
+        break;
     case '\n':
         if (cursor + 80 >= 80 * 25)
             scroll_line();

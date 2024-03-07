@@ -22,6 +22,7 @@ add_executable("fantacom"
 
     "src/io_devices/mmu.cpp"
     "src/io_devices/graphics.cpp"
+    "src/io_devices/keyboard.cpp"
 )
 target_include_directories("fantacom" PRIVATE "include")
 target_link_libraries("fantacom" "Z80" "argparse" "raylib")

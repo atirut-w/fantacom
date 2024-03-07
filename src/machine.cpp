@@ -90,6 +90,9 @@ Machine::Machine()
 
     graphics = std::make_shared<Graphics>();
     io_devices[0x0100] = graphics;
+
+    keyboard = std::make_shared<Keyboard>();
+    io_devices[0x0200] = keyboard;
 }
 
 void Machine::interrupt(std::vector<uint8_t> &data)

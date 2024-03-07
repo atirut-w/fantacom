@@ -1,8 +1,9 @@
 #include <z80io.h>
 #include <stdio.h>
 #include <string.h>
+#include <keyboard.h>
 
-int display_init()
+int init_display()
 {
     // Find a memory bank for our VGA buffer
     // NOTE: We can continue on from the bank we used as RAM
@@ -46,13 +47,31 @@ int memcheck()
     return total;
 }
 
+void init_interrupts()
+{
+__asm
+    ei
+    ret
+__endasm;
+}
+
 int main()
 {
-    if (display_init() != 0)
+    if (init_display() != 0)
         return -1;
+    init_interrupts();
     
     printf("FantaCom Boot ROM (C) Atirut Wattanamongkol & contributors\n\n");
     memcheck();
+
+    while (1)
+    {
+        int scancode = pop_key();
+        if (scancode == 0 || (scancode & 0x8000) != 0)
+            continue;
+        
+        printf("Scancode: 0x%04x\n", scancode);
+    }
 
     return 0;
 }

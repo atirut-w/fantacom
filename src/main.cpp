@@ -177,8 +177,10 @@ int main(int argc, char *argv[])
 
     InitWindow(SCREEN_WIDTH * 8 * 2, SCREEN_HEIGHT * 16 * 2, "Fantacom - Initializing...");
     SetTargetFPS(60);
+    SetExitKey(KEY_NULL);
     auto font_texture = generate_font_texture(font);
     RenderTexture2D screen_rt = LoadRenderTexture(SCREEN_WIDTH * 8, SCREEN_HEIGHT * 16);
+    std::vector<int> held_keys;
 
     std::thread cpu(cpu_thread, parser->get<int>("--frequency") * 1000000, machine);
     while (!WindowShouldClose())
@@ -221,6 +223,31 @@ int main(int argc, char *argv[])
         BeginDrawing();
         DrawTexturePro(screen_rt.texture, {0, 0, SCREEN_WIDTH * 8, -SCREEN_HEIGHT * 16}, {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()}, {0, 0}, 0, WHITE);
         EndDrawing();
+
+        auto keycode = GetKeyPressed();
+        if (keycode != 0)
+        {
+            held_keys.push_back(keycode);
+            machine->keyboard->registers.scancode = keycode;
+            machine->interrupt(std::vector<uint8_t>{0b11000111 | (1 << 3)}); // RST 08h
+        }
+        else
+        {
+            for (int i = held_keys.size() - 1; i >= 0; i--)
+            {
+                if (IsKeyReleased(held_keys[i]))
+                {
+                    machine->keyboard->registers.scancode = held_keys[i] | 0x8000;
+                    machine->interrupt(std::vector<uint8_t>{0b11000111 | (1 << 3)});
+                    held_keys.erase(held_keys.begin() + i);
+                }
+                else if (IsKeyPressedRepeat(held_keys[i]))
+                {
+                    machine->keyboard->registers.scancode = held_keys[i];
+                    machine->interrupt(std::vector<uint8_t>{0b11000111 | (1 << 3)});
+                }
+            }
+        }
 
         SetWindowTitle(("Fantacom - " + std::to_string(GetFPS()) + " FPS").c_str());
     }
