@@ -143,41 +143,6 @@ Texture2D generate_font_texture(const Unifont::Font &font)
     return tex;
 }
 
-int get_scancode(int key)
-{
-    auto map = std::vector<int>{
-        KEY_NULL,
-        KEY_ONE, KEY_TWO, KEY_THREE, KEY_FOUR, KEY_FIVE, KEY_SIX, KEY_SEVEN, KEY_EIGHT, KEY_NINE, KEY_ZERO, KEY_MINUS, KEY_EQUAL, KEY_BACKSPACE,
-        KEY_TAB, KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P, KEY_LEFT_BRACKET, KEY_RIGHT_BRACKET,
-        KEY_ENTER,
-        KEY_LEFT_CONTROL,
-        KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_H, KEY_J, KEY_K, KEY_L, KEY_SEMICOLON, KEY_APOSTROPHE,
-        KEY_GRAVE,
-        KEY_LEFT_SHIFT,
-        KEY_BACKSLASH,
-        KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B, KEY_N, KEY_M, KEY_COMMA, KEY_PERIOD, KEY_SLASH, KEY_RIGHT_SHIFT,
-        KEY_KP_MULTIPLY,
-        KEY_LEFT_ALT, KEY_SPACE,
-        KEY_CAPS_LOCK,
-        KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10,
-        KEY_NUM_LOCK,
-        KEY_SCROLL_LOCK,
-        KEY_KP_7, KEY_KP_8, KEY_KP_9,
-        KEY_KP_SUBTRACT,
-        KEY_KP_4, KEY_KP_5, KEY_KP_6, KEY_KP_ADD,
-        KEY_KP_1, KEY_KP_2, KEY_KP_3,
-        KEY_KP_0, KEY_KP_DECIMAL,
-        KEY_PRINT_SCREEN
-    };
-    
-    for (int i = 0; i < map.size(); i++)
-    {
-        if (map[i] == key)
-            return i;
-    }
-    return 0; // Error scan code
-}
-
 int main(int argc, char *argv[])
 {
     auto parser = parse_args(argc, argv);
@@ -212,6 +177,7 @@ int main(int argc, char *argv[])
 
     InitWindow(SCREEN_WIDTH * 8 * 2, SCREEN_HEIGHT * 16 * 2, "Fantacom - Initializing...");
     SetTargetFPS(60);
+    SetExitKey(KEY_NULL);
     auto font_texture = generate_font_texture(font);
     RenderTexture2D screen_rt = LoadRenderTexture(SCREEN_WIDTH * 8, SCREEN_HEIGHT * 16);
     std::vector<int> pressed;
@@ -262,7 +228,7 @@ int main(int argc, char *argv[])
         if (keycode != 0)
         {
             pressed.push_back(keycode);
-            machine->keyboard->registers.scancode = get_scancode(keycode);
+            machine->keyboard->registers.scancode = keycode;
             machine->interrupt(std::vector<uint8_t>{0b11000111 | (1 << 3)}); // RST 08h
         }
         else
@@ -271,13 +237,13 @@ int main(int argc, char *argv[])
             {
                 if (IsKeyReleased(pressed[i]))
                 {
-                    machine->keyboard->registers.scancode = get_scancode(pressed[i]) | 0x80;
+                    machine->keyboard->registers.scancode = pressed[i] | 0x8000;
                     machine->interrupt(std::vector<uint8_t>{0b11000111 | (1 << 3)});
                     pressed.erase(pressed.begin() + i);
                 }
                 else if (IsKeyPressedRepeat(pressed[i]))
                 {
-                    machine->keyboard->registers.scancode = get_scancode(pressed[i]);
+                    machine->keyboard->registers.scancode = pressed[i];
                     machine->interrupt(std::vector<uint8_t>{0b11000111 | (1 << 3)});
                 }
             }
