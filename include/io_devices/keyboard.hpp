@@ -11,7 +11,6 @@ public:
     
     struct
     {
-        uint16_t last_pressed;
-        uint8_t character;
+        uint8_t scancode;
     } registers;
 };
