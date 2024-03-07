@@ -47,7 +47,7 @@ void cpu_thread(int frequency, std::shared_ptr<Machine> machine)
         else
         {
             machine->mutex.lock();
-            waste = z80_run(&machine->cpu, 1) - 1; // -1 because this counts as the first cycle of the instruction
+            waste = machine->tick() - 1; // -1 because this counts as the first cycle of the instruction
             machine->mutex.unlock();
         }
 

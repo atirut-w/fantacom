@@ -94,11 +94,21 @@ Machine::Machine()
 
 void Machine::interrupt(std::vector<uint8_t> &data)
 {
-    interrupt_data = data;
+    for (auto &d : data)
+    {
+        interrupt_data.push_back(d);
+    }
     z80_int(&cpu, 1);
 }
 
 void Machine::nmi_interrupt()
 {
     z80_nmi(&cpu);
+}
+
+int Machine::tick()
+{
+    if (interrupt_data.size() > 0)
+        z80_int(&cpu, 1);
+    return z80_run(&cpu, 1);
 }

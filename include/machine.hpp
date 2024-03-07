@@ -27,5 +27,5 @@ public:
     Machine();
     void interrupt(std::vector<uint8_t> &data);
     void nmi_interrupt();
-    void tick();
+    int tick();
 };
