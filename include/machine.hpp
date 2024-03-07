@@ -9,6 +9,7 @@
 #include <mutex>
 #include <io_devices/graphics.hpp>
 #include <memory>
+#include <io_devices/keyboard.hpp>
 
 class Machine
 {
@@ -23,6 +24,7 @@ public:
 
     std::shared_ptr<MMU> mmu;
     std::shared_ptr<Graphics> graphics;
+    std::shared_ptr<Keyboard> keyboard;
 
     Machine();
     void interrupt(std::vector<uint8_t> &data);

@@ -222,6 +222,14 @@ int main(int argc, char *argv[])
         DrawTexturePro(screen_rt.texture, {0, 0, SCREEN_WIDTH * 8, -SCREEN_HEIGHT * 16}, {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()}, {0, 0}, 0, WHITE);
         EndDrawing();
 
+        auto keycode = GetKeyPressed();
+        if (keycode != 0)
+        {
+            machine->keyboard->registers.last_pressed = keycode;
+            machine->keyboard->registers.character = GetCharPressed();
+            machine->interrupt(std::vector<uint8_t>{0b11000111 | (1 << 3)}); // RST 08h
+        }
+
         SetWindowTitle(("Fantacom - " + std::to_string(GetFPS()) + " FPS").c_str());
     }
 
