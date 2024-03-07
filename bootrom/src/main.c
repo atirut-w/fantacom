@@ -1,6 +1,7 @@
 #include <z80io.h>
 #include <stdio.h>
 #include <string.h>
+#include <keyboard.h>
 
 int init_display()
 {
@@ -62,6 +63,15 @@ int main()
     
     printf("FantaCom Boot ROM (C) Atirut Wattanamongkol & contributors\n\n");
     memcheck();
+
+    while (1)
+    {
+        int scancode = pop_key();
+        if (scancode == 0 || (scancode & 0x8000) != 0)
+            continue;
+        
+        printf("Scancode: 0x%04x\n", scancode);
+    }
 
     return 0;
 }
