@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
     SetExitKey(KEY_NULL);
     auto font_texture = generate_font_texture(font);
     RenderTexture2D screen_rt = LoadRenderTexture(SCREEN_WIDTH * 8, SCREEN_HEIGHT * 16);
-    std::vector<int> pressed;
+    std::vector<int> held_keys;
 
     std::thread cpu(cpu_thread, parser->get<int>("--frequency") * 1000000, machine);
     while (!WindowShouldClose())
@@ -227,23 +227,23 @@ int main(int argc, char *argv[])
         auto keycode = GetKeyPressed();
         if (keycode != 0)
         {
-            pressed.push_back(keycode);
+            held_keys.push_back(keycode);
             machine->keyboard->registers.scancode = keycode;
             machine->interrupt(std::vector<uint8_t>{0b11000111 | (1 << 3)}); // RST 08h
         }
         else
         {
-            for (int i = pressed.size() - 1; i >= 0; i--)
+            for (int i = held_keys.size() - 1; i >= 0; i--)
             {
-                if (IsKeyReleased(pressed[i]))
+                if (IsKeyReleased(held_keys[i]))
                 {
-                    machine->keyboard->registers.scancode = pressed[i] | 0x8000;
+                    machine->keyboard->registers.scancode = held_keys[i] | 0x8000;
                     machine->interrupt(std::vector<uint8_t>{0b11000111 | (1 << 3)});
-                    pressed.erase(pressed.begin() + i);
+                    held_keys.erase(held_keys.begin() + i);
                 }
-                else if (IsKeyPressedRepeat(pressed[i]))
+                else if (IsKeyPressedRepeat(held_keys[i]))
                 {
-                    machine->keyboard->registers.scancode = pressed[i];
+                    machine->keyboard->registers.scancode = held_keys[i];
                     machine->interrupt(std::vector<uint8_t>{0b11000111 | (1 << 3)});
                 }
             }
