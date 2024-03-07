@@ -1,6 +1,6 @@
 #include <io_devices/graphics.hpp>
 
-Graphics::Graphics()
+Graphics::Graphics(void *ctx) : IODevice(ctx)
 {
     size = sizeof(registers);
 }

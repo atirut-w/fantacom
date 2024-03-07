@@ -4,7 +4,7 @@
 
 using namespace std;
 
-MMU::MMU()
+MMU::MMU(void *ctx) : IODevice(ctx)
 {
     size = sizeof(registers);
     registers.flags |= ROM_ENABLE;

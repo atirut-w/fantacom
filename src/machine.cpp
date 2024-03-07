@@ -83,15 +83,15 @@ Machine::Machine()
     cpu.inta = int_ack;
     cpu.int_fetch = int_ack;
 
-    mmu = std::make_shared<MMU>();
+    mmu = std::make_shared<MMU>(this);
     mmu->rom = &rom;
     mmu->ram = &ram;
     io_devices[0] = mmu;
 
-    graphics = std::make_shared<Graphics>();
+    graphics = std::make_shared<Graphics>(this);
     io_devices[0x0100] = graphics;
 
-    keyboard = std::make_shared<Keyboard>();
+    keyboard = std::make_shared<Keyboard>(this);
     io_devices[0x0200] = keyboard;
 }
 

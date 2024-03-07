@@ -1,6 +1,6 @@
 #include <io_devices/keyboard.hpp>
 
-Keyboard::Keyboard()
+Keyboard::Keyboard(void *ctx) : IODevice(ctx)
 {
     size = sizeof(registers);
 }
