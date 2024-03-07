@@ -8,7 +8,7 @@ SRC_DIR = src
 
 CFLAGS = +z80 -clib=classic -I$(SRC_DIR)/include -c
 CRT_OPTS = CRT_ORG_BSS=0x2000 REGISTER_SP=0x3000 CRT_ENABLE_RST=0x02
-LFLAGS = +z80 -clib=classic -crt0=crt0.asm $(addprefix -pragma-define:, $(CRT_OPTS)) -m
+LFLAGS = +z80 -clib=classic -crt0=crt0.asm $(addprefix -pragma-define:, $(CRT_OPTS)) -create-app -m
 
 .PHONY: configure build clean
 
@@ -23,9 +23,7 @@ clean:
 
 build: main.o z80io.o console.o keyboard.o
 	@echo "Linking..."
-	@$(CC) $(LFLAGS) -o$(BUILD_DIR)/bootrom.bin $(patsubst %.o, $(OBJ_DIR)/%.o, $^)
-	@echo "Concatenating DATA..."
-	@cat $(BUILD_DIR)/bootrom_DATA.bin >> $(BUILD_DIR)/bootrom.bin
+	@$(CC) $(LFLAGS) -o$(BUILD_DIR)/bootrom $(patsubst %.o, $(OBJ_DIR)/%.o, $^)
 
 %.o: $(SRC_DIR)/%.c
 	@echo "Compiling $<..."
