@@ -97,6 +97,12 @@ Machine::Machine()
 
 void Machine::queue_interrupt(uint8_t interrupt)
 {
+    if (interrupt > 128)
+    {
+        std::cout << "WARN: Bad interrupt vector (" << interrupt << "). Not queueing" << std::endl;
+        return;
+    }
+    
     mutex.lock();
     interrupt_queue.push_back(interrupt);
     mutex.unlock();
