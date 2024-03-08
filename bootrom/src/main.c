@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <keyboard.h>
+#include <ivt.h>
 
 int init_display()
 {
@@ -47,9 +48,27 @@ int memcheck()
     return total;
 }
 
+void bad_int() __interrupt
+{
+    printf("BAD INT");
+}
+
 void init_interrupts()
 {
+    for (int i = 0; i < 128; i++)
+    {
+        ivt[i] = bad_int;
+    }
+    keyboard_install_interrupt();
+
 __asm
+    push af
+    GLOBAL _ivt
+    ld a, _ivt >> 8
+    ld i, a
+    pop af
+
+    im 2
     ei
     ret
 __endasm;

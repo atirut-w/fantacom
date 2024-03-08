@@ -11,6 +11,7 @@ public:
     
     struct
     {
+        uint8_t interrupt;
         uint16_t scancode;
     } registers;
 };

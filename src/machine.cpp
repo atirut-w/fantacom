@@ -57,11 +57,11 @@ uint8_t int_ack(void *ctx, uint16_t address)
     Machine &machine = *(Machine *)ctx;
     z80_int(&machine.cpu, 0);
     
-    if (machine.interrupt_data.size() > 0)
+    if (machine.interrupt_queue.size() > 0)
     {
-        auto value = machine.interrupt_data[0];
-        machine.interrupt_data.erase(machine.interrupt_data.begin());
-        return value;
+        auto value = machine.interrupt_queue[0];
+        machine.interrupt_queue.erase(machine.interrupt_queue.begin());
+        return value << 1;
     }
     else
     {
@@ -95,13 +95,17 @@ Machine::Machine()
     io_devices[0x0200] = keyboard;
 }
 
-void Machine::interrupt(std::vector<uint8_t> &data)
+void Machine::queue_interrupt(uint8_t interrupt)
 {
-    for (auto &d : data)
+    if (interrupt > 128)
     {
-        interrupt_data.push_back(d);
+        std::cout << "WARN: Bad interrupt vector (" << interrupt << "). Not queueing" << std::endl;
+        return;
     }
-    z80_int(&cpu, 1);
+    
+    mutex.lock();
+    interrupt_queue.push_back(interrupt);
+    mutex.unlock();
 }
 
 void Machine::nmi_interrupt()
@@ -111,7 +115,10 @@ void Machine::nmi_interrupt()
 
 int Machine::tick()
 {
-    if (interrupt_data.size() > 0)
+    mutex.lock();
+    if (interrupt_queue.size() > 0)
         z80_int(&cpu, 1);
-    return z80_run(&cpu, 1);
+    int cycles = z80_run(&cpu, 1);
+    mutex.unlock();
+    return cycles;
 }

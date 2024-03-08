@@ -15,7 +15,7 @@ class Machine
 {
 public:
     Z80 cpu;
-    std::vector<uint8_t> interrupt_data;
+    std::vector<uint8_t> interrupt_queue;
     std::array<uint8_t, 0x2000> rom;
     std::vector<uint8_t> ram;
 
@@ -27,7 +27,7 @@ public:
     std::shared_ptr<Keyboard> keyboard;
 
     Machine();
-    void interrupt(std::vector<uint8_t> &data);
+    void queue_interrupt(uint8_t interrupt);
     void nmi_interrupt();
     int tick();
 };

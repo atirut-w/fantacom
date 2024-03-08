@@ -23,9 +23,7 @@ void cpu_thread(int frequency, std::shared_ptr<Machine> machine)
         }
         else
         {
-            machine->mutex.lock();
             waste = machine->tick() - 1; // -1 because this counts as the first cycle of the instruction
-            machine->mutex.unlock();
         }
 
         std::this_thread::sleep_for(std::chrono::seconds((long)(1.0 / frequency)));
@@ -169,7 +167,7 @@ int main(int argc, char *argv[])
         {
             held_keys.push_back(keycode);
             machine->keyboard->registers.scancode = keycode;
-            machine->interrupt(std::vector<uint8_t>{0b11000111 | (1 << 3)}); // RST 08h
+            machine->queue_interrupt(machine->keyboard->registers.interrupt);
         }
         else
         {
@@ -178,13 +176,13 @@ int main(int argc, char *argv[])
                 if (IsKeyReleased(held_keys[i]))
                 {
                     machine->keyboard->registers.scancode = held_keys[i] | 0x8000;
-                    machine->interrupt(std::vector<uint8_t>{0b11000111 | (1 << 3)});
+                    machine->queue_interrupt(machine->keyboard->registers.interrupt);
                     held_keys.erase(held_keys.begin() + i);
                 }
                 else if (IsKeyPressedRepeat(held_keys[i]))
                 {
                     machine->keyboard->registers.scancode = held_keys[i];
-                    machine->interrupt(std::vector<uint8_t>{0b11000111 | (1 << 3)});
+                    machine->queue_interrupt(machine->keyboard->registers.interrupt);
                 }
             }
         }
