@@ -161,31 +161,7 @@ int main(int argc, char *argv[])
     while (!WindowShouldClose())
     {
         machine->graphics->render();
-
-        auto keycode = GetKeyPressed();
-        if (keycode != 0)
-        {
-            held_keys.push_back(keycode);
-            machine->keyboard->registers.scancode = keycode;
-            machine->queue_interrupt(machine->keyboard->registers.interrupt);
-        }
-        else
-        {
-            for (int i = held_keys.size() - 1; i >= 0; i--)
-            {
-                if (IsKeyReleased(held_keys[i]))
-                {
-                    machine->keyboard->registers.scancode = held_keys[i] | 0x8000;
-                    machine->queue_interrupt(machine->keyboard->registers.interrupt);
-                    held_keys.erase(held_keys.begin() + i);
-                }
-                else if (IsKeyPressedRepeat(held_keys[i]))
-                {
-                    machine->keyboard->registers.scancode = held_keys[i];
-                    machine->queue_interrupt(machine->keyboard->registers.interrupt);
-                }
-            }
-        }
+        machine->keyboard->update();
 
         SetWindowTitle(("Fantacom - " + std::to_string(GetFPS()) + " FPS").c_str());
     }
