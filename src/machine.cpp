@@ -97,8 +97,9 @@ Machine::Machine()
 
 void Machine::queue_interrupt(uint8_t interrupt)
 {
+    mutex.lock();
     interrupt_queue.push_back(interrupt);
-    z80_int(&cpu, 1);
+    mutex.unlock();
 }
 
 void Machine::nmi_interrupt()
@@ -108,7 +109,10 @@ void Machine::nmi_interrupt()
 
 int Machine::tick()
 {
+    mutex.lock();
     if (interrupt_queue.size() > 0)
         z80_int(&cpu, 1);
-    return z80_run(&cpu, 1);
+    int cycles = z80_run(&cpu, 1);
+    mutex.unlock();
+    return cycles;
 }

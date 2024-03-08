@@ -23,9 +23,7 @@ void cpu_thread(int frequency, std::shared_ptr<Machine> machine)
         }
         else
         {
-            machine->mutex.lock();
             waste = machine->tick() - 1; // -1 because this counts as the first cycle of the instruction
-            machine->mutex.unlock();
         }
 
         std::this_thread::sleep_for(std::chrono::seconds((long)(1.0 / frequency)));
