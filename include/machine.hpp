@@ -10,6 +10,7 @@
 #include <io_devices/graphics.hpp>
 #include <memory>
 #include <io_devices/keyboard.hpp>
+#include <io_devices/disk_ctrl.hpp>
 
 class Machine
 {
@@ -25,6 +26,7 @@ public:
     std::shared_ptr<MMU> mmu;
     std::shared_ptr<Graphics> graphics;
     std::shared_ptr<Keyboard> keyboard;
+    std::shared_ptr<DiskCtrl> disk_ctrl;
 
     Machine();
     void queue_interrupt(uint8_t interrupt);

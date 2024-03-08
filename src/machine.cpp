@@ -93,6 +93,9 @@ Machine::Machine()
 
     keyboard = std::make_shared<Keyboard>(this);
     io_devices[0x0200] = keyboard;
+
+    disk_ctrl = std::make_shared<DiskCtrl>(this);
+    io_devices[0x0300] = disk_ctrl;
 }
 
 void Machine::queue_interrupt(uint8_t interrupt)
