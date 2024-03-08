@@ -50,7 +50,7 @@ int memcheck()
 
 void bad_int() __interrupt
 {
-    puts("BAD INT\n");
+    printf("BAD INT");
 }
 
 void init_interrupts()
