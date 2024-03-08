@@ -59,7 +59,7 @@ void init_interrupts()
     {
         ivt[i] = bad_int;
     }
-    keyboard_init_ivt();
+    keyboard_install_interrupt();
 
 __asm
     push af
