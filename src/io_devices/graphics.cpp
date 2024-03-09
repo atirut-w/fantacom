@@ -60,7 +60,7 @@ void Graphics::render()
     std::array<Character, SCREEN_WIDTH * SCREEN_HEIGHT> screen;
 
     machine.mutex.lock();
-        {
+    {
         uint16_t screen_offset = machine.graphics->registers.buffer_page << 8;
         for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++)
         {
