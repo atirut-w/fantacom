@@ -96,6 +96,7 @@ int main()
 
     char sector[512];
     disk_read(0, sector);
+    // Note: don't wait, just draw the column header while the controller DMAs
 
     printf("\\  ");
     for (int i = 0; i < 16; i++)
