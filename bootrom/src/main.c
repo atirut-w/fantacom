@@ -85,26 +85,17 @@ int main()
     memcheck();
 
     disk_select(0);
-    if (disk_send_command(0) == 0)
+    if (!disk_check_presense())
     {
         printf("Disk 0 not present\n");
         return -1;
     }
-    printf("Last sector: %u\n", disk_send_command(1));
-    disk_set_data(0);
-    disk_send_command(3); // Seek to sector 0
+    printf("Last sector: %u\n", disk_get_last_sector());
+    disk_seek(0);
+    disk_wait_idle();
 
     char sector[512];
-    disk_set_data(&sector);
-    disk_send_command(4);
-
-    printf("Waiting for disk... ");
-    int stat = disk_send_command(2);
-    do
-    {
-        stat = disk_send_command(2);
-    } while (stat == 1);
-    printf("OK\n");
+    disk_read(0, sector);
 
     printf("\\  ");
     for (int i = 0; i < 16; i++)
@@ -118,6 +109,7 @@ int main()
     }
     printf("----------------\n");
 
+    disk_wait_idle();
     for (int row = 0; row < 16; row++)
     {
         printf("%01Xx ", row);
