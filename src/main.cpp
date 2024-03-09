@@ -7,6 +7,7 @@
 #include <memory>
 #include <atomic>
 #include <unifont.hpp>
+#include <cstdio>
 
 std::atomic_bool running = true;
 
@@ -51,6 +52,12 @@ std::shared_ptr<const argparse::ArgumentParser> parse_args(int argc, char *argv[
         .help("Target CPU frequency in MHz")
         .default_value(1)
         .scan<'i', int>();
+    
+    // Disk images
+    parser->add_argument("-d", "--disk")
+        .help("Disk images")
+        .default_value(std::vector<std::string>())
+        .nargs(argparse::nargs_pattern::at_least_one);
 
     try
     {
@@ -143,6 +150,17 @@ int main(int argc, char *argv[])
         }
 
         bootrom.read((char *)machine->rom.data(), machine->rom.size());
+    }
+
+    for (auto filename : parser->get<std::vector<std::string>>("disk"))
+    {
+        auto stream = std::make_shared<std::ifstream>(filename, std::ios::binary);
+        if (!*stream)
+        {
+            std::cout << "Unable to open disk image `" << filename << "`" << std::endl;
+            exit(1);
+        }
+        machine->disk_ctrl->disks.push_back(Disk(stream));
     }
 
     std::ifstream font_file("font.hex");
