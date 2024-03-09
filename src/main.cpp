@@ -52,7 +52,7 @@ std::shared_ptr<const argparse::ArgumentParser> parse_args(int argc, char *argv[
 
 Texture2D generate_font_texture(const Unifont::Font &font)
 {
-    RenderTexture2D rt = LoadRenderTexture(8 * 16, 16 * 16);
+    auto rt = LoadRenderTexture(8 * 16, 16 * 16);
     std::array<int, 256> cp437 = {
         0x0000, 0x263a, 0x263b, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022, 0x25d8, 0x25cb, 0x25d9, 0x2642, 0x2640, 0x266a, 0x266b, 0x263c,
         0x25ba, 0x25c4, 0x2195, 0x203c, 0x00b6, 0x00a7, 0x25ac, 0x21a8, 0x2191, 0x2193, 0x2192, 0x2190, 0x221f, 0x2194, 0x25b2, 0x25bc,
@@ -94,34 +94,32 @@ Texture2D generate_font_texture(const Unifont::Font &font)
     }
     EndTextureMode();
 
-    Image img = LoadImageFromTexture(rt.texture);
+    auto img = LoadImageFromTexture(rt.texture);
     UnloadRenderTexture(rt);
     ImageFlipVertical(&img);
-    Texture2D tex = LoadTextureFromImage(img);
+    auto tex = LoadTextureFromImage(img);
     UnloadImage(img);
     return tex;
 }
 
-int main(int argc, char *argv[])
+std::shared_ptr<Machine> setup_machine(std::shared_ptr<const argparse::ArgumentParser> args)
 {
-    auto parser = parse_args(argc, argv);
-
-    std::shared_ptr<Machine> machine = std::make_shared<Machine>();
-    machine->ram.resize(parser->get<int>("--ram") * 0x1000);
+    auto machine = std::make_shared<Machine>();
+    machine->ram.resize(args->get<int>("--ram") * 0x1000);
     for (int i = 0; i < machine->ram.size(); i++)
     {
         machine->ram[i] = i & 1 ? '@' : 0x19;
     }
 
     {
-        std::ifstream bootrom(parser->get<std::string>("bootrom"), std::ios::binary);
+        std::ifstream bootrom(args->get<std::string>("bootrom"), std::ios::binary);
 
         if (!bootrom)
         {
             std::cerr << "Could not open boot ROM image" << std::endl;
             exit(1);
         }
-        if (std::filesystem::file_size(parser->get<std::string>("bootrom")) > machine->rom.size())
+        if (std::filesystem::file_size(args->get<std::string>("bootrom")) > machine->rom.size())
         {
             std::cerr << "WARN: Boot ROM image too large, truncating" << std::endl;
         }
@@ -129,7 +127,7 @@ int main(int argc, char *argv[])
         bootrom.read((char *)machine->rom.data(), machine->rom.size());
     }
 
-    for (auto filename : parser->get<std::vector<std::string>>("disk"))
+    for (auto filename : args->get<std::vector<std::string>>("disk"))
     {
         auto stream = std::make_shared<std::ifstream>(filename, std::ios::binary);
         if (!*stream)
@@ -139,6 +137,14 @@ int main(int argc, char *argv[])
         }
         machine->disk_ctrl->disks.push_back(Disk(stream));
     }
+
+    return machine;
+}
+
+int main(int argc, char *argv[])
+{
+    auto args = parse_args(argc, argv);
+    auto machine = setup_machine(args);
 
     std::ifstream font_file("font.hex");
     if (!font_file)
@@ -150,7 +156,7 @@ int main(int argc, char *argv[])
     SetExitKey(KEY_NULL);
     machine->graphics->init();
     machine->graphics->font = generate_font_texture(font);
-    float frequency = parser->get<float>("--frequency") * 1000000;
+    float frequency = args->get<float>("--frequency") * 1000000;
     int adjust = 0;
 
     while (!WindowShouldClose())
