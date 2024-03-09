@@ -3,6 +3,7 @@
 #include <string.h>
 #include <keyboard.h>
 #include <ivt.h>
+#include <disk.h>
 
 int init_display()
 {
@@ -83,13 +84,53 @@ int main()
     printf("FantaCom Boot ROM (C) Atirut Wattanamongkol & contributors\n\n");
     memcheck();
 
-    while (1)
+    disk_select(0);
+    if (disk_send_command(0) == 0)
     {
-        int scancode = pop_key();
-        if (scancode == 0 || (scancode & 0x8000) != 0)
-            continue;
-        
-        printf("Scancode: 0x%04x\n", scancode);
+        printf("Disk 0 not present\n");
+        return -1;
+    }
+    printf("Last sector: %u\n", disk_send_command(1));
+    disk_set_data(0);
+    disk_send_command(3); // Seek to sector 0
+
+    char sector[512];
+    disk_set_data(&sector);
+    disk_send_command(4);
+
+    printf("Waiting for disk... ");
+    int stat = disk_send_command(2);
+    do
+    {
+        stat = disk_send_command(2);
+    } while (stat == 1);
+    printf("OK\n");
+
+    printf("\\  ");
+    for (int i = 0; i < 16; i++)
+    {
+        printf("x%01X ", i);
+    }
+    printf("0123456789ABCDEF\n \\ ");
+    for (int i = 0; i < 16; i++)
+    {
+        printf("-- ");
+    }
+    printf("----------------\n");
+
+    for (int row = 0; row < 16; row++)
+    {
+        printf("%01Xx ", row);
+        for (int col = 0; col < 16; col++)
+        {
+            printf("%02x ", sector[row * 16 + col] & 0xff);
+        }
+        for (int col = 0; col < 16; col++)
+        {
+            char ch = sector[row * 16 + col];
+            printf("%c", ch < 32 || ch > 126 ? '.' : ch);
+        }
+        printf("\n");
     }
 
     return 0;
