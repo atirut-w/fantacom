@@ -27,8 +27,8 @@ std::shared_ptr<const argparse::ArgumentParser> parse_args(int argc, char *argv[
     // Target CPU frequency in MHz
     parser->add_argument("-f", "--frequency")
         .help("Target CPU frequency in MHz")
-        .default_value(1)
-        .scan<'i', int>();
+        .default_value(1.0f)
+        .scan<'g', float>();
     
     // Disk images
     parser->add_argument("-d", "--disk")
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     SetExitKey(KEY_NULL);
     machine->graphics->init();
     machine->graphics->font = generate_font_texture(font);
-    int frequency = parser->get<int>("--frequency") * 1000000;
+    float frequency = parser->get<float>("--frequency") * 1000000;
     int adjust = 0;
 
     while (!WindowShouldClose())
