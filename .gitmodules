@@ -10,3 +10,6 @@
 [submodule "3rd/raylib"]
 	path = 3rd/raylib
 	url = https://github.com/raysan5/raylib
+[submodule "3rd/raygui"]
+	path = 3rd/raygui
+	url = https://github.com/raysan5/raygui

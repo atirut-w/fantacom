@@ -24,5 +24,5 @@ add_executable("fantacom"
     "src/io_devices/keyboard.cpp"
     "src/io_devices/disk_ctrl.cpp"
 )
-target_include_directories("fantacom" PRIVATE "include")
+target_include_directories("fantacom" PRIVATE "include" "3rd/raygui/src")
 target_link_libraries("fantacom" "Z80" "argparse" "raylib")
