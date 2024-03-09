@@ -14,11 +14,27 @@ public:
         STATUS_IDLE,
         STATUS_BUSY
     } status = STATUS_IDLE;
-    std::mutex mutex;
+    std::shared_ptr<std::mutex> mutex;
 
     Disk(std::shared_ptr<std::istream> disk_stream)
     {
         this->disk_stream = disk_stream;
+        mutex = std::make_shared<std::mutex>();
+    }
+
+    int get_status()
+    {
+        mutex->lock();
+        auto result = status;
+        mutex->unlock();
+        return result;
+    }
+
+    void set_status(Status status)
+    {
+        mutex->lock();
+        this->status = status;
+        mutex->unlock();
     }
 };
 
@@ -31,7 +47,7 @@ public:
     uint8_t in(uint16_t addr) override;
     void out(uint16_t addr, uint8_t val) override;
 
-    struct
+    struct Registers
     {
         uint8_t disk_select;
         uint8_t command;
