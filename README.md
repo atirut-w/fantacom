@@ -1,5 +1,6 @@
 # Fantacom
-A WIP toy/fantasy computer, powered by the Z80.
+A WIP toy/fantasy computer, powered by the Z80. Documentations can be found
+[here](docs/README.md)
 
 ## The specs
 - 8KiB ROM. A boot ROM for testing can be found in the `bootrom` directory.
