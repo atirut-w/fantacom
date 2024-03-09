@@ -9,33 +9,33 @@ int init_display()
     // Find a memory bank for our VGA buffer
     // NOTE: We can continue on from the bank we used as RAM
     volatile char *test_ptr = (char *)0x3000;
-    uint8_t bank = in_port(2) + 1;
+    uint8_t bank = inc_port(2) + 1;
     do
     {
-        out_port(3, bank++);
+        outc_port(3, bank++);
         *test_ptr = 0x55;
         if (*test_ptr == 0x55)
             break;
     } while (bank != 0);
 
-    if (in_port(3) == 0)
+    if (inc_port(3) == 0)
         return -1; // Checked all banks, no luck
 
     memset((void *)test_ptr, 0, 80 * 25 * 2);
-    out_port(0x0100, 0x30); // Set VGA buffer to 0x3000
+    outc_port(0x0100, 0x30); // Set VGA buffer to 0x3000
     return 0;
 }
 
 int memcheck()
 {
     volatile char *test_ptr = (char *)0x4000;
-    uint8_t bank = in_port(3) + 1;
+    uint8_t bank = inc_port(3) + 1;
     int total = 8;
 
     printf("Performing memory check...\n");
     do
     {
-        out_port(4, bank++);
+        outc_port(4, bank++);
         *test_ptr = 0x55;
         if (*test_ptr == 0x55)
         {

@@ -1,6 +1,6 @@
 #include <z80io.h>
 
-char in_port(int port) __naked
+char inc_port(int port) __naked
 {
 __asm
     pop de ; Return address
@@ -18,7 +18,7 @@ __asm
 __endasm;
 }
 
-void out_port(int port, char value) __naked
+void outc_port(int port, char value) __naked
 {
 __asm
     pop de ; Return address
@@ -31,4 +31,15 @@ __asm
     push de
     ret
 __endasm;
+}
+
+int inw_port(int port)
+{
+    return inc_port(port) | inc_port(port + 1) << 8;
+}
+
+void outw_port(int port, int value)
+{
+    outc_port(port, value & 0xff);
+    outc_port(port + 1, value >> 8);
 }

@@ -23,7 +23,7 @@ int pop_key()
 // Keyboard interrupt handler
 void keyboard_handler() __interrupt
 {
-    int scancode = in_port(0x0202) | (in_port(0x0203) << 8);
+    int scancode = inw_port(0x0202);
 
     buffer[head++] = scancode;
     head %= 16;
@@ -33,6 +33,6 @@ void keyboard_handler() __interrupt
 
 void keyboard_install_interrupt()
 {
-    out_port(0x0200, KEYBOARD_INTERRUPT);
+    outc_port(0x0200, KEYBOARD_INTERRUPT);
     ivt[KEYBOARD_INTERRUPT] = keyboard_handler;
 }
