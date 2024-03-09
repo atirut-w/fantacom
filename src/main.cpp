@@ -9,29 +9,6 @@
 #include <unifont.hpp>
 #include <cstdio>
 
-std::atomic_bool running = true;
-
-void cpu_thread(int frequency, std::shared_ptr<Machine> machine)
-{
-    int waste = 0;
-
-    std::cout << "CPU thread started" << std::endl;
-    while (running)
-    {
-        if (waste > 0)
-        {
-            waste--;
-        }
-        else
-        {
-            waste = machine->tick() - 1; // -1 because this counts as the first cycle of the instruction
-        }
-
-        std::this_thread::sleep_for(std::chrono::seconds((long)(1.0 / frequency)));
-    }
-    std::cout << "CPU thread stopped" << std::endl;
-}
-
 std::shared_ptr<const argparse::ArgumentParser> parse_args(int argc, char *argv[])
 {
     auto parser = std::make_shared<argparse::ArgumentParser>("fantacom");
@@ -173,20 +150,21 @@ int main(int argc, char *argv[])
     SetExitKey(KEY_NULL);
     machine->graphics->init();
     machine->graphics->font = generate_font_texture(font);
+    int frequency = parser->get<int>("--frequency") * 1000000;
+    int adjust = 0;
 
-    std::thread cpu(cpu_thread, parser->get<int>("--frequency") * 1000000, machine);
     while (!WindowShouldClose())
     {
         machine->graphics->render();
         machine->keyboard->update();
 
+        int target_cycles = GetFrameTime() * frequency;
+        int cycles_ran = machine->run(target_cycles - adjust);
+        adjust = cycles_ran - target_cycles;
+
         SetWindowTitle(("Fantacom - " + std::to_string(GetFPS()) + " FPS").c_str());
     }
 
-    running = false;
-    cpu.join();
-
     CloseWindow();
-
     return 0;
 }

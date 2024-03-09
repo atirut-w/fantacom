@@ -116,12 +116,12 @@ void Machine::nmi_interrupt()
     z80_nmi(&cpu);
 }
 
-int Machine::tick()
+int Machine::run(int cycles)
 {
     mutex.lock();
     if (interrupt_queue.size() > 0)
         z80_int(&cpu, 1);
-    int cycles = z80_run(&cpu, 1);
+    int actual_cycles = z80_run(&cpu, cycles);
     mutex.unlock();
-    return cycles;
+    return actual_cycles;
 }

@@ -31,5 +31,5 @@ public:
     Machine();
     void queue_interrupt(uint8_t interrupt);
     void nmi_interrupt();
-    int tick();
+    int run(int cycles);
 };
