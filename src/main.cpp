@@ -173,7 +173,6 @@ int main(int argc, char *argv[])
     SetExitKey(KEY_NULL);
     machine->graphics->init();
     machine->graphics->font = generate_font_texture(font);
-    std::vector<int> held_keys;
 
     std::thread cpu(cpu_thread, parser->get<int>("--frequency") * 1000000, machine);
     while (!WindowShouldClose())
