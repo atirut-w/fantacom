@@ -9,6 +9,9 @@ class Disk
 {
 public:
     std::shared_ptr<std::istream> disk_stream;
+    int last_sector;
+    int current_sector;
+
     enum Status
     {
         STATUS_IDLE,
@@ -19,6 +22,12 @@ public:
     Disk(std::shared_ptr<std::istream> disk_stream)
     {
         this->disk_stream = disk_stream;
+        
+        disk_stream->seekg(0, std::ios::end);
+        last_sector = (disk_stream->tellg() / 512) - 1;
+        disk_stream->seekg(0);
+        current_sector = 0;
+
         mutex = std::make_shared<std::mutex>();
     }
 

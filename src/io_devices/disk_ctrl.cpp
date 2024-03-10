@@ -36,21 +36,7 @@ void DiskCtrl::out(uint16_t addr, uint8_t val)
         {
         case COMMAND_GET_LAST_SECTOR:
         {
-            if (disks[registers.disk_select].get_status() == Disk::STATUS_BUSY)
-            {
-                registers.data = 0;
-                break;
-            }
-            disks[registers.disk_select].set_status(Disk::STATUS_BUSY);
-
-            auto stream = disks[registers.disk_select].disk_stream;
-            auto current = stream->tellg();
-            stream->seekg(0, std::ios::end);
-            auto result = (stream->tellg() / 512) - 1;
-            stream->seekg(current);
-
-            disks[registers.disk_select].set_status(Disk::STATUS_IDLE);
-            registers.data = result;
+            registers.data = disks[registers.disk_select].last_sector;
             break;
         }
         case COMMAND_GET_STATUS:
@@ -58,14 +44,29 @@ void DiskCtrl::out(uint16_t addr, uint8_t val)
             break;
         case COMMAND_SEEK:
         {
-            if (disks[registers.disk_select].get_status() == Disk::STATUS_BUSY)
+            Disk &disk = disks[registers.disk_select];
+            if (disk.get_status() == Disk::STATUS_BUSY)
             {
                 registers.data = 0;
                 break;
             }
-            disks[registers.disk_select].set_status(Disk::STATUS_BUSY);
-            disks[registers.disk_select].disk_stream->seekg(registers.data * 512);
-            disks[registers.disk_select].set_status(Disk::STATUS_IDLE);
+            disk.set_status(Disk::STATUS_BUSY);
+            disk.disk_stream->seekg(registers.data * 512);
+            disk.current_sector = registers.data;
+            
+            if (registers.data != disk.current_sector + 1)
+            {
+                auto worker = std::thread([registers = registers, disk = &disk]() {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    disk->set_status(Disk::STATUS_IDLE);
+                });
+                worker.detach();
+            }
+            else
+            {
+                disk.set_status(Disk::STATUS_IDLE);
+            }
+
             break;
         }
         case COMMAND_READ:
