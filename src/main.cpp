@@ -139,6 +139,12 @@ std::shared_ptr<Machine> setup_machine(std::shared_ptr<const argparse::ArgumentP
     return machine;
 }
 
+void present_rt(RenderTexture2D rt)
+{
+    auto texture = rt.texture;
+    DrawTexturePro(texture, {0, 0, (float)texture.width, (float)-texture.height}, {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()}, {0, 0}, 0, WHITE);
+}
+
 int main(int argc, char *argv[])
 {
     auto args = parse_args(argc, argv);
@@ -159,14 +165,17 @@ int main(int argc, char *argv[])
 
     while (!WindowShouldClose())
     {
-        machine->graphics->render();
-        machine->keyboard->update();
-
         int target_cycles = GetFrameTime() * frequency;
         int cycles_ran = machine->run(target_cycles - adjust);
         adjust = cycles_ran - target_cycles;
 
+        machine->graphics->render();
+        machine->keyboard->update();
+
         SetWindowTitle(("Fantacom - " + std::to_string(GetFPS()) + " FPS").c_str());
+        BeginDrawing();
+        present_rt(machine->graphics->screen_rt);
+        EndDrawing();
     }
 
     CloseWindow();

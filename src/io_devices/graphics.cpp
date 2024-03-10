@@ -91,8 +91,4 @@ void Graphics::render()
         DrawTexturePro(font, char_rect, dst_rect, {0, 0}, 0, palette[character.attributes & 0x0f]);
     }
     EndTextureMode();
-
-    BeginDrawing();
-    DrawTexturePro(screen_rt.texture, {0, 0, SCREEN_WIDTH * 8, -SCREEN_HEIGHT * 16}, {0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()}, {0, 0}, 0, WHITE);
-    EndDrawing();
 }
