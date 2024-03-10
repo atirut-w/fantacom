@@ -16,7 +16,6 @@ add_subdirectory("3rd/raylib")
 
 add_executable("fantacom"
     "src/main.cpp"
-    "src/globals.cpp"
     "src/machine.cpp"
     "src/unifont.cpp"
 

@@ -3,14 +3,15 @@
 #include <array>
 #include <cstdint>
 #include <vector>
-#include <io_device.hpp>
-#include <io_devices/mmu.hpp>
 #include <map>
 #include <mutex>
-#include <io_devices/graphics.hpp>
 #include <memory>
-#include <io_devices/keyboard.hpp>
+
+#include <io_device.hpp>
 #include <io_devices/disk_ctrl.hpp>
+#include <io_devices/keyboard.hpp>
+#include <io_devices/graphics.hpp>
+#include <io_devices/mmu.hpp>
 
 class Machine
 {

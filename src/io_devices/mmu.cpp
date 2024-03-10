@@ -1,6 +1,4 @@
 #include <io_devices/mmu.hpp>
-#include <iostream>
-#include <iomanip>
 
 using namespace std;
 

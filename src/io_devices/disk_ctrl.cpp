@@ -1,6 +1,5 @@
 #include <io_devices/disk_ctrl.hpp>
 #include <machine.hpp>
-#include <iostream>
 #include <thread>
 
 DiskCtrl::DiskCtrl(void *ctx) : IODevice(ctx)

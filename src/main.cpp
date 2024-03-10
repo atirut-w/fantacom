@@ -5,9 +5,7 @@
 #include <filesystem>
 #include <raylib.h>
 #include <memory>
-#include <atomic>
 #include <unifont.hpp>
-#include <cstdio>
 
 std::shared_ptr<const argparse::ArgumentParser> parse_args(int argc, char *argv[])
 {
