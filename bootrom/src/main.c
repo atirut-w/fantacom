@@ -61,7 +61,6 @@ MemInfo memcheck()
         if (*test_ptr == 0x55)
         {
             total += 4;
-            printf("\r%4d KiB", total);
             info.num_banks++;
             info.bankmap[(bank / 8)] |= (1 << (bank % 8));
         }
