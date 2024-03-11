@@ -44,7 +44,7 @@ void disk_seek(int sector)
     disk_send_command(3);
 }
 
-void disk_read(int sector, void *data)
+void disk_read(void *data)
 {
     disk_set_data(data);
     disk_send_command(4);

@@ -10,23 +10,14 @@
 
 int init_display()
 {
-    uint8_t bank = 0;
-    do
-    {
-        bool present = meminfo.bankmap[(bank / 8)] & (1 << (bank % 8));
-        bool reserved = meminfo.reserved[(bank / 8)] & (1 << (bank % 8));
-        if (present && !reserved)
-        {
-            meminfo.reserved[(bank / 8)] |= (1 << (bank % 8));
-            outc_port(3, bank);
-            memset((void *)0x3000, 0, 80 * 25 * 2);
-            outc_port(0x0100, 0x30); // Set VGA buffer to 0x3000
-            return 0;
-        }
-        bank++;
-    } while (bank != 0);
+    int bank = memory_get_free_bank();
+    if (bank == -1)
+        return -1;
 
-    return -1;
+    outc_port(3, bank);
+    memset((char *)0x3000, 0, 80 * 25 * 2);
+    outc_port(0x0100, 0x30); // Set VGA buffer to 0x3000
+    return 0;
 }
 
 void bad_int() __interrupt
@@ -72,41 +63,35 @@ int main()
         printf("Disk 0 not present\n");
         return -1;
     }
-    printf("Last sector: %u\n", disk_get_last_sector());
     disk_seek(0);
     disk_wait_idle();
 
-    char sector[512];
-    disk_read(0, sector);
-    // Note: don't wait, just draw the column header while the controller DMAs
-
-    printf("\\  ");
-    for (int i = 0; i < 16; i++)
     {
-        printf("x%01X ", i);
+        uint8_t bank = memory_get_free_bank();
+        if (bank == -1)
+        {
+            printf("Could not allocate memory for boot sector\n");
+            return -1;
+        }
+        outc_port(0x8, bank);
     }
-    printf("0123456789ABCDEF\n \\ ");
-    for (int i = 0; i < 16; i++)
-    {
-        printf("-- ");
-    }
-    printf("----------------\n");
 
+    uint8_t *sector = (uint8_t *)0x8000; // Top 32 KiB of RAM
+    disk_read(sector);
     disk_wait_idle();
-    for (int row = 0; row < 16; row++)
+
+    if (*(uint16_t *)0x81fe != 0xaa55)
     {
-        printf("%01Xx ", row);
-        for (int col = 0; col < 16; col++)
-        {
-            printf("%02x ", sector[row * 16 + col] & 0xff);
-        }
-        for (int col = 0; col < 16; col++)
-        {
-            char ch = sector[row * 16 + col];
-            printf("%c", ch < 32 || ch > 126 ? '.' : ch);
-        }
-        printf("\n");
+        printf("Disk 0 not bootable\n");
+        return -1;
     }
+
+    return 0;
+
+    // Bye, have a good time
+__asm
+    call 0x8000
+__endasm;
 
     return 0;
 }

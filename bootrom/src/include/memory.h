@@ -10,3 +10,5 @@ typedef struct
 extern MemInfo meminfo;
 
 void memory_init_meminfo();
+int memory_get_free_bank();
+void memory_free_bank(int bank);

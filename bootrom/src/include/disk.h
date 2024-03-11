@@ -10,4 +10,4 @@ int disk_get_status();
 void disk_wait_idle();
 int disk_get_last_sector();
 void disk_seek(int sector);
-void disk_read(int sector, void *data);
+void disk_read(void *data);

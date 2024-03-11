@@ -1,6 +1,8 @@
 #include <memory.h>
 #include <z80io.h>
 #include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 MemInfo meminfo;
 
@@ -30,4 +32,26 @@ void memory_init_meminfo()
         }
         bank++;
     } while (bank != 0);
+}
+
+int memory_get_free_bank()
+{
+    uint8_t bank = 0;
+    do
+    {
+        bool present = meminfo.bankmap[(bank / 8)] & (1 << (bank % 8));
+        bool reserved = meminfo.reserved[(bank / 8)] & (1 << (bank % 8));
+        if (present && !reserved)
+        {
+            meminfo.reserved[(bank / 8)] |= (1 << (bank % 8));
+            return bank;
+        }
+        bank++;
+    } while (bank != 0);
+    return -1;
+}
+
+void memory_free_bank(int bank)
+{
+    meminfo.reserved[(bank / 8)] &= ~(1 << (bank % 8));
 }
