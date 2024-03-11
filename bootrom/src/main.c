@@ -6,7 +6,7 @@
 #include <disk.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <meminfo.h>
+#include <memory.h>
 
 int init_display()
 {
@@ -58,7 +58,7 @@ __endasm;
 int main()
 {
     outc_port(0x0100, 0); // Assure the user we entered BIOS by flashing the ROM's guts
-    meminfo_init();
+    memory_init_meminfo();
     if (init_display() != 0)
         return -1;
     init_interrupts();

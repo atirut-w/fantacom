@@ -1,10 +1,10 @@
-#include <meminfo.h>
+#include <memory.h>
 #include <z80io.h>
 #include <string.h>
 
 MemInfo meminfo;
 
-void meminfo_init()
+void memory_init_meminfo()
 {
     volatile char *test_ptr = (char *)0x3000;
     memset(&meminfo, 0, sizeof(MemInfo));
