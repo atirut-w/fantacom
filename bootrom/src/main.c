@@ -4,6 +4,7 @@
 #include <keyboard.h>
 #include <ivt.h>
 #include <disk.h>
+#include <stdint.h>
 
 int init_display()
 {
@@ -27,13 +28,32 @@ int init_display()
     return 0;
 }
 
-int memcheck()
+typedef struct
 {
-    volatile char *test_ptr = (char *)0x4000;
-    uint8_t bank = inc_port(3) + 1;
-    int total = 8;
+    uint8_t num_banks;
+    uint8_t bankmap[32];
+} MemInfo;
 
-    printf("Performing memory check...\n");
+MemInfo memcheck()
+{
+    MemInfo info;
+    volatile char *test_ptr = (char *)0x4000;
+    uint8_t bios_ram = inc_port(2);
+    uint8_t vga_ram = inc_port(3);
+    uint8_t valid_start = 0;
+    uint8_t valid_end = 0;
+
+    printf("Building bankmap...\n");
+    for (uint8_t bank = 0; bank < bios_ram; bank++)
+    {
+        info.bankmap[(bank / 8)] &= ~(1 << (bank % 8)); // Anything that comes before is guaranteed to be invalid
+    }
+    info.bankmap[(bios_ram / 8)] |= (1 << (bios_ram % 8));
+    info.bankmap[(vga_ram / 8)] |= (1 << (vga_ram % 8));
+    info.num_banks = 2;
+    
+    uint8_t bank = vga_ram + 1;
+    int total = 8; // 8KiB guaranteed (BIOS & VGA RAM)
     do
     {
         outc_port(4, bank++);
@@ -42,11 +62,17 @@ int memcheck()
         {
             total += 4;
             printf("\r%4d KiB", total);
+            info.num_banks++;
+            info.bankmap[(bank / 8)] |= (1 << (bank % 8));
+        }
+        else
+        {
+            info.bankmap[(bank / 8)] &= ~(1 << (bank % 8));
         }
     } while (bank != 0);
     printf(" OK\n");
 
-    return total;
+    return info;
 }
 
 void bad_int() __interrupt
