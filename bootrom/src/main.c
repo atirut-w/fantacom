@@ -5,72 +5,65 @@
 #include <ivt.h>
 #include <disk.h>
 #include <stdint.h>
+#include <stdbool.h>
 
-int init_display()
-{
-    // Find a memory bank for our VGA buffer
-    // NOTE: We can continue on from the bank we used as RAM
-    volatile char *test_ptr = (char *)0x3000;
-    uint8_t bank = inc_port(2) + 1;
-    do
-    {
-        outc_port(3, bank++);
-        *test_ptr = 0x55;
-        if (*test_ptr == 0x55)
-            break;
-    } while (bank != 0);
-
-    if (inc_port(3) == 0)
-        return -1; // Checked all banks, no luck
-
-    memset((void *)test_ptr, 0, 80 * 25 * 2);
-    outc_port(0x0100, 0x30); // Set VGA buffer to 0x3000
-    return 0;
-}
-
-typedef struct
+struct
 {
     uint8_t num_banks;
     uint8_t bankmap[32];
-} MemInfo;
+    uint8_t reserved[32];
+} meminfo;
 
-MemInfo memprobe()
+int init_display()
 {
-    MemInfo info;
-    volatile char *test_ptr = (char *)0x4000;
-    uint8_t bios_ram = inc_port(2);
-    uint8_t vga_ram = inc_port(3);
-
-    printf("Probing memory...");
-    for (uint8_t bank = 0; bank < bios_ram; bank++)
-    {
-        info.bankmap[(bank / 8)] &= ~(1 << (bank % 8)); // Anything that comes before is guaranteed to be invalid
-    }
-    info.bankmap[(bios_ram / 8)] |= (1 << (bios_ram % 8));
-    info.bankmap[(vga_ram / 8)] |= (1 << (vga_ram % 8));
-    info.num_banks = 2;
-    
-    uint8_t bank = vga_ram + 1;
-    int total = 8; // 8KiB guaranteed (BIOS & VGA RAM)
+    uint8_t bank = 0;
     do
     {
-        outc_port(4, bank);
-        *test_ptr = 0x55;
-        if (*test_ptr == 0x55)
+        bool present = meminfo.bankmap[(bank / 8)] & (1 << (bank % 8));
+        bool reserved = meminfo.reserved[(bank / 8)] & (1 << (bank % 8));
+        if (present && !reserved)
         {
-            total += 4;
-            info.num_banks++;
-            info.bankmap[(bank / 8)] |= (1 << (bank % 8));
-        }
-        else
-        {
-            info.bankmap[(bank / 8)] &= ~(1 << (bank % 8));
+            meminfo.reserved[(bank / 8)] |= (1 << (bank % 8));
+            outc_port(3, bank);
+            memset((void *)0x3000, 0, 80 * 25 * 2);
+            outc_port(0x0100, 0x30); // Set VGA buffer to 0x3000
+            return 0;
         }
         bank++;
     } while (bank != 0);
-    printf(" %dKiB total\n", total);
 
-    return info;
+    return -1;
+}
+
+void init_meminfo()
+{
+    volatile char *test_ptr = (char *)0x3000;
+    uint8_t bios_ram = inc_port(2);
+
+    for (uint8_t bank = 0; bank < bios_ram; bank++)
+    {
+        meminfo.bankmap[(bank / 8)] &= ~(1 << (bank % 8)); // Anything that comes before is guaranteed to be invalid
+    }
+    meminfo.bankmap[(bios_ram / 8)] |= (1 << (bios_ram % 8));
+    meminfo.reserved[(bios_ram / 8)] |= (1 << (bios_ram % 8));
+    meminfo.num_banks = 1;
+    
+    uint8_t bank = bios_ram + 1;
+    do
+    {
+        outc_port(3, bank);
+        *test_ptr = 0x55;
+        if (*test_ptr == 0x55)
+        {
+            meminfo.num_banks++;
+            meminfo.bankmap[(bank / 8)] |= (1 << (bank % 8));
+        }
+        else
+        {
+            meminfo.bankmap[(bank / 8)] &= ~(1 << (bank % 8));
+        }
+        bank++;
+    } while (bank != 0);
 }
 
 void bad_int() __interrupt
@@ -101,12 +94,14 @@ __endasm;
 
 int main()
 {
+    outc_port(0x0100, 0x00); // Assure the user we entered BIOS by flashing the ROM's guts
+    init_meminfo();
     if (init_display() != 0)
         return -1;
     init_interrupts();
     
     printf("FantaCom Boot ROM (C) Atirut Wattanamongkol & contributors\n\n");
-    memprobe();
+    printf("Total memory: %d KiB\n", meminfo.num_banks * 4);
 
     disk_select(0);
     if (!disk_check_presense())
