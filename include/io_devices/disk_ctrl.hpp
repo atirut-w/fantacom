@@ -24,7 +24,7 @@ public:
         this->disk_stream = disk_stream;
         
         disk_stream->seekg(0, std::ios::end);
-        last_sector = (disk_stream->tellg() / 512) - 1;
+        last_sector = (disk_stream->tellg() / 512);
         disk_stream->seekg(0);
         current_sector = 0;
 
