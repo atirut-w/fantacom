@@ -34,7 +34,7 @@ typedef struct
     uint8_t bankmap[32];
 } MemInfo;
 
-MemInfo memcheck()
+MemInfo memprobe()
 {
     MemInfo info;
     volatile char *test_ptr = (char *)0x4000;
@@ -43,7 +43,7 @@ MemInfo memcheck()
     uint8_t valid_start = 0;
     uint8_t valid_end = 0;
 
-    printf("Building bankmap...\n");
+    printf("Probing memory...");
     for (uint8_t bank = 0; bank < bios_ram; bank++)
     {
         info.bankmap[(bank / 8)] &= ~(1 << (bank % 8)); // Anything that comes before is guaranteed to be invalid
@@ -69,7 +69,7 @@ MemInfo memcheck()
             info.bankmap[(bank / 8)] &= ~(1 << (bank % 8));
         }
     } while (bank != 0);
-    printf(" OK\n");
+    printf(" %dKiB total\n", total);
 
     return info;
 }
@@ -107,7 +107,7 @@ int main()
     init_interrupts();
     
     printf("FantaCom Boot ROM (C) Atirut Wattanamongkol & contributors\n\n");
-    memcheck();
+    memprobe();
 
     disk_select(0);
     if (!disk_check_presense())
