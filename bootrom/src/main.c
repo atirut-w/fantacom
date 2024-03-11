@@ -40,8 +40,6 @@ MemInfo memprobe()
     volatile char *test_ptr = (char *)0x4000;
     uint8_t bios_ram = inc_port(2);
     uint8_t vga_ram = inc_port(3);
-    uint8_t valid_start = 0;
-    uint8_t valid_end = 0;
 
     printf("Probing memory...");
     for (uint8_t bank = 0; bank < bios_ram; bank++)
@@ -56,7 +54,7 @@ MemInfo memprobe()
     int total = 8; // 8KiB guaranteed (BIOS & VGA RAM)
     do
     {
-        outc_port(4, bank++);
+        outc_port(4, bank);
         *test_ptr = 0x55;
         if (*test_ptr == 0x55)
         {
@@ -68,6 +66,7 @@ MemInfo memprobe()
         {
             info.bankmap[(bank / 8)] &= ~(1 << (bank % 8));
         }
+        bank++;
     } while (bank != 0);
     printf(" %dKiB total\n", total);
 
