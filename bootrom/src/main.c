@@ -6,13 +6,7 @@
 #include <disk.h>
 #include <stdint.h>
 #include <stdbool.h>
-
-struct
-{
-    uint8_t num_banks;
-    uint8_t bankmap[32];
-    uint8_t reserved[32];
-} meminfo;
+#include <meminfo.h>
 
 int init_display()
 {
@@ -33,37 +27,6 @@ int init_display()
     } while (bank != 0);
 
     return -1;
-}
-
-void init_meminfo()
-{
-    volatile char *test_ptr = (char *)0x3000;
-    uint8_t bios_ram = inc_port(2);
-
-    for (uint8_t bank = 0; bank < bios_ram; bank++)
-    {
-        meminfo.bankmap[(bank / 8)] &= ~(1 << (bank % 8)); // Anything that comes before is guaranteed to be invalid
-    }
-    meminfo.bankmap[(bios_ram / 8)] |= (1 << (bios_ram % 8));
-    meminfo.reserved[(bios_ram / 8)] |= (1 << (bios_ram % 8));
-    meminfo.num_banks = 1;
-    
-    uint8_t bank = bios_ram + 1;
-    do
-    {
-        outc_port(3, bank);
-        *test_ptr = 0x55;
-        if (*test_ptr == 0x55)
-        {
-            meminfo.num_banks++;
-            meminfo.bankmap[(bank / 8)] |= (1 << (bank % 8));
-        }
-        else
-        {
-            meminfo.bankmap[(bank / 8)] &= ~(1 << (bank % 8));
-        }
-        bank++;
-    } while (bank != 0);
 }
 
 void bad_int() __interrupt
@@ -94,8 +57,8 @@ __endasm;
 
 int main()
 {
-    outc_port(0x0100, 0x00); // Assure the user we entered BIOS by flashing the ROM's guts
-    init_meminfo();
+    outc_port(0x0100, 0); // Assure the user we entered BIOS by flashing the ROM's guts
+    meminfo_init();
     if (init_display() != 0)
         return -1;
     init_interrupts();
