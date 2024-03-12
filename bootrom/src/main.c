@@ -86,8 +86,6 @@ int main()
         return -1;
     }
 
-    return 0;
-
     // Bye, have a good time
 __asm
     call 0x8000
