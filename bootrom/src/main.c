@@ -62,6 +62,26 @@ int boot_simplefs()
         return -1;
     }
     printf("%d blocks used out of %d\n", superblock.blocks_used_low, superblock.blocks_low);
+
+    NamelistEntry root;
+    NamelistEntry current;
+
+    simplefs_seek(superblock, 2);
+    simplefs_read(superblock, scratch, 1);
+    memcpy(&root, scratch, sizeof(NamelistEntry));
+
+    int block = (root.datablock * 128) / superblock.block_size;
+    int offset = (root.datablock * 128) % superblock.block_size;
+
+    do
+    {
+        simplefs_seek(superblock, block + 2);
+        simplefs_read(superblock, scratch, 1);
+        memcpy(&current, scratch + offset, sizeof(NamelistEntry));
+        printf("%s\n", current.fname);
+        block = (current.next * 128) / superblock.block_size;
+        offset = (current.next * 128) % superblock.block_size;
+    } while (current.next > 0);
     
     return 0;
 }

@@ -1,5 +1,6 @@
 #include <simplefs.h>
 #include <disk.h>
+#include <string.h>
 
 void simplefs_seek(Superblock superblock, int block)
 {
@@ -7,11 +8,11 @@ void simplefs_seek(Superblock superblock, int block)
     disk_wait_idle();
 }
 
-void simplefs_read(Superblock superblock, uint8_t *buffer, int count)
+void simplefs_read(Superblock superblock, void *buffer, int count)
 {
     for (int i = 0; i < count; i++)
     {
-        for (int j = 0; i < (superblock.block_size / 512); j++)
+        for (int j = 0; j < (superblock.block_size / 512); j++)
         {
             disk_read(buffer);
             buffer += 512;
