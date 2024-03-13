@@ -80,16 +80,24 @@ int main()
     disk_read(sector);
     disk_wait_idle();
 
-    if (*(uint16_t *)0x81fe != 0xaa55)
+    if (*(uint16_t *)0x81fe == 0xaa55)
     {
-        printf("Disk 0 not bootable\n");
+    __asm
+        ld hl, 0x3000
+        ld sp, hl
+        jp 0x8000
+    __endasm;
+    }
+    else if (memcmp(sector, "\x1bSFS", 4) == 0)
+    {
+        printf("SimpleFS volume detected.\n");
+        return 0;
+    }
+    else
+    {
+        printf("Disk 0 is not bootable\n");
         return -1;
     }
-
-    // Bye, have a good time
-__asm
-    call 0x8000
-__endasm;
 
     return 0;
 }
