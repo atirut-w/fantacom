@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <memory.h>
+#include <simplefs.h>
 
 int init_display()
 {
@@ -44,6 +45,25 @@ __asm
     ei
     ret
 __endasm;
+}
+
+int boot_simplefs()
+{
+    uint8_t *scratch = (uint8_t *)0x8000;
+    Superblock superblock;
+    memcpy(superblock, scratch, sizeof(Superblock));
+    printf("Attempting to boot from %s\n", superblock.label);
+
+    // We can only address up to sector 0xffff, so we have to check if the FS is too large
+    int block_size_s = superblock.block_size / 512;
+    if (superblock.blocks_low > (0x10000 / block_size_s) || superblock.blocks_high > 0)
+    {
+        printf("Filesystem too large\n");
+        return -1;
+    }
+    printf("%d blocks used out of %d\n", superblock.blocks_used_low, superblock.blocks_low);
+    
+    return 0;
 }
 
 int main()
@@ -90,7 +110,7 @@ int main()
     }
     else if (memcmp(sector, "\x1bSFS", 4) == 0)
     {
-        printf("SimpleFS volume detected.\n");
+        boot_simplefs();
         return 0;
     }
     else
