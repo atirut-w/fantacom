@@ -77,8 +77,11 @@ int boot_simplefs()
     printf("Finding boot.bin...");
     do
     {
-        simplefs_seek(superblock, block + 2);
-        simplefs_read(superblock, scratch, 1);
+        if (offset == 0)
+        {
+            simplefs_seek(superblock, block + 2);
+            simplefs_read(superblock, scratch, 1);
+        }
         memcpy(&current, scratch + offset, sizeof(NamelistEntry));
         
         if (memcmp("boot.bin", current.fname, 8) == 0 && current.flags & FILE_FLAGS_TYPE_MASK == FILE_FLAGS_TYPE_FILE)
