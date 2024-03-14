@@ -72,16 +72,31 @@ int boot_simplefs()
 
     int block = (root.datablock * 128) / superblock.block_size;
     int offset = (root.datablock * 128) % superblock.block_size;
+    bool bootable = false;
 
+    printf("Finding boot.bin...");
     do
     {
         simplefs_seek(superblock, block + 2);
         simplefs_read(superblock, scratch, 1);
         memcpy(&current, scratch + offset, sizeof(NamelistEntry));
-        printf("%s\n", current.fname);
+        
+        if (memcmp("boot.bin", current.fname, 8) == 0 && current.flags & FILE_FLAGS_TYPE_MASK == FILE_FLAGS_TYPE_FILE)
+        {
+            bootable = true;
+            break;
+        }
+
         block = (current.next * 128) / superblock.block_size;
         offset = (current.next * 128) % superblock.block_size;
     } while (current.next > 0);
+
+    if (!bootable)
+    {
+        printf(" not found\n");
+        return -1;
+    }
+    printf(" loading...");
     
     return 0;
 }
