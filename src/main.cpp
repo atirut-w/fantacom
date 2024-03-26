@@ -5,8 +5,7 @@
 #include <filesystem>
 #include <raylib.h>
 #include <memory>
-#include <unifont.hpp>
-#include <cp437.hpp>
+#include <font.hpp>
 
 std::shared_ptr<const argparse::ArgumentParser> parse_args(int argc, char *argv[])
 {
@@ -49,24 +48,22 @@ std::shared_ptr<const argparse::ArgumentParser> parse_args(int argc, char *argv[
     return parser;
 }
 
-Texture2D generate_font_texture(const Unifont::Font &font)
+Texture2D generate_font_texture()
 {
-    auto rt = LoadRenderTexture(8 * 16, 16 * 16);
+    auto rt = LoadRenderTexture(8, 16 * 256);
     BeginTextureMode(rt);
     ClearBackground(BLANK);
-    for (int i = 0; i < 256; i++)
+    for (int n_char = 0; n_char < 256; n_char++)
     {
-        auto glyph = font.glyphs.at(i);
-        int base_x = (i & 0x0f) * 8;
-        int base_y = (i >> 4) * 16;
+        int base_y = n_char * 16;
         for (int y = 0; y < 16; y++)
         {
-            auto row = glyph.data[y];
+            auto line = font[n_char * 16 + y];
             for (int x = 0; x < 8; x++)
             {
-                if (row & (1 << x))
+                if (line & (1 << (7 - x)))
                 {
-                    DrawPixel(base_x + (7 - x), base_y + y, WHITE);
+                    DrawPixel(x, base_y + y, WHITE);
                 }
             }
         }
@@ -129,21 +126,17 @@ void present_rt(RenderTexture2D rt)
 int main(int argc, char *argv[])
 {
     auto args = parse_args(argc, argv);
-    auto machine = setup_machine(args);
-
-    std::ifstream font_file("font.hex");
-    if (!font_file)
-        throw std::runtime_error("Failed to open font file");
-    Unifont::Font font(font_file);
 
     InitWindow(1280, 800, "Fantacom - Initializing...");
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
+
+    auto machine = setup_machine(args);
     machine->graphics->init();
-    machine->graphics->font = generate_font_texture(font);
+    machine->graphics->font = generate_font_texture();
+
     float frequency = args->get<float>("--frequency") * 1000000;
     int adjust = 0;
-
     while (!WindowShouldClose())
     {
         int target_cycles = GetFrameTime() * frequency;
@@ -159,6 +152,5 @@ int main(int argc, char *argv[])
         EndDrawing();
     }
 
-    CloseWindow();
     return 0;
 }

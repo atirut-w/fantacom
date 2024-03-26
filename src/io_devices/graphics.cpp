@@ -77,8 +77,8 @@ void Graphics::render()
         Character character = screen[i];
         DrawRectangle((i % SCREEN_WIDTH) * 8, (i / SCREEN_WIDTH) * 16, 8, 16, palette[(character.attributes >> 4) & 0x07]);
         Rectangle char_rect = {
-            (float)(character.character & 0x0f) * 8,
-            (float)(character.character >> 4) * 16,
+            0,
+            (float)character.character * 16,
             8,
             16
         };
