@@ -53,18 +53,14 @@ Texture2D generate_font_texture()
     auto rt = LoadRenderTexture(8, 16 * 256);
     BeginTextureMode(rt);
     ClearBackground(BLANK);
-    for (int n_char = 0; n_char < 256; n_char++)
+    for (int n_line = 0; n_line < 16 * 256; n_line++)
     {
-        int base_y = n_char * 16;
-        for (int y = 0; y < 16; y++)
+        auto line = font[n_line];
+        for (int x = 0; x < 8; x++)
         {
-            auto line = font[n_char * 16 + y];
-            for (int x = 0; x < 8; x++)
+            if (line & (1 << (7 - x)))
             {
-                if (line & (1 << (7 - x)))
-                {
-                    DrawPixel(x, base_y + y, WHITE);
-                }
+                DrawPixel(x, n_line, WHITE);
             }
         }
     }
