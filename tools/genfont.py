@@ -42,7 +42,7 @@ with open("font.cpp", "w") as f:
             glyph = glyph[0:32]
         
         f.write("    ")
-        for i in range(0, 30, 2):
-            f.write("0x" + glyph[i:i + 2] + ", ")
-        f.write("0x" + glyph[30:32] + ",\n")
+        for i in range(0, 32, 2):
+            f.write(("0x" + glyph[i:i + 2] + ", ").lower())
+        f.write("\n")
     f.write("};\n")
