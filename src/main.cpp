@@ -110,6 +110,9 @@ std::shared_ptr<Machine> setup_machine(std::shared_ptr<const argparse::ArgumentP
         machine->disk_ctrl->disks.push_back(Disk(stream));
     }
 
+    machine->graphics->init();
+    machine->graphics->font = generate_font_texture();
+
     return machine;
 }
 
@@ -128,9 +131,6 @@ int main(int argc, char *argv[])
     SetExitKey(KEY_NULL);
 
     auto machine = setup_machine(args);
-    machine->graphics->init();
-    machine->graphics->font = generate_font_texture();
-
     float frequency = args->get<float>("--frequency") * 1000000;
     int adjust = 0;
     while (!WindowShouldClose())
