@@ -15,8 +15,9 @@ public:
     uint8_t in(uint16_t addr) override;
     void out(uint16_t addr, uint8_t val) override;
 
-    struct
+    struct Registers
     {
+        uint8_t auto_increment;
         uint8_t device_select;
         uint8_t address;
         uint8_t data;
