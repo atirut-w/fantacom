@@ -18,7 +18,9 @@ int init_display()
 
     outb(3, bank);
     memset((char *)0x3000, 0, 80 * 25 * 2);
-    outb(0x0100, 0x30); // Set VGA buffer to 0x3000
+    outb(0x0101, 0);
+    outb(0x0102, 8);
+    outb(0x0103, 0x30); // Set VGA buffer to 0x3000
     return 0;
 }
 
@@ -50,13 +52,10 @@ __endasm;
 
 int main()
 {
-    // outb(0x0100, 0); // Assure the user we entered BIOS by flashing the ROM's guts
     memory_init_meminfo();
     if (init_display() != 0)
         return -1;
     init_interrupts();
-
-    return 0; // TODO: Update the following codes for the new Internal Component Interconnect system.
     
     printf("FantaCom Boot ROM (C) Atirut Wattanamongkol & contributors\n\n");
     printf("Total memory: %d KiB\n", meminfo.num_banks * 4);

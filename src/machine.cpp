@@ -92,6 +92,7 @@ Machine::Machine()
 
     graphics = std::make_shared<Graphics>(this);
     // io_devices[0x0100] = graphics;
+    ici->devices[0] = graphics;
 
     keyboard = std::make_shared<Keyboard>(this);
     // io_devices[0x0200] = keyboard;

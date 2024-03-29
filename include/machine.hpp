@@ -10,9 +10,10 @@
 #include <io_device.hpp>
 #include <io_devices/disk_ctrl.hpp>
 #include <io_devices/keyboard.hpp>
-#include <io_devices/graphics.hpp>
 #include <io_devices/mmu.hpp>
 #include <io_devices/ici.hpp>
+
+#include <ici_devices/graphics.hpp>
 
 class Machine
 {
