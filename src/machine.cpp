@@ -102,7 +102,7 @@ void Machine::queue_interrupt(uint8_t interrupt)
 {
     if (interrupt > 128)
     {
-        std::cout << "WARN: Bad interrupt vector (" << interrupt << "). Not queueing" << std::endl;
+        std::cout << "WARN: Bad interrupt vector (0x" << std::hex << (int)interrupt << "), not queueing" << std::endl;
         return;
     }
     
