@@ -23,6 +23,7 @@ add_executable("fantacom"
     "src/io_devices/graphics.cpp"
     "src/io_devices/keyboard.cpp"
     "src/io_devices/disk_ctrl.cpp"
+    "src/io_devices/ici.cpp"
 )
 target_include_directories("fantacom" PRIVATE "include")
 target_link_libraries("fantacom" "Z80" "argparse" "raylib")

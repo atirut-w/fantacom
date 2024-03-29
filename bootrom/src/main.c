@@ -50,11 +50,13 @@ __endasm;
 
 int main()
 {
-    outb(0x0100, 0); // Assure the user we entered BIOS by flashing the ROM's guts
+    // outb(0x0100, 0); // Assure the user we entered BIOS by flashing the ROM's guts
     memory_init_meminfo();
     if (init_display() != 0)
         return -1;
     init_interrupts();
+
+    return 0; // TODO: Update the following codes for the new Internal Component Interconnect system.
     
     printf("FantaCom Boot ROM (C) Atirut Wattanamongkol & contributors\n\n");
     printf("Total memory: %d KiB\n", meminfo.num_banks * 4);

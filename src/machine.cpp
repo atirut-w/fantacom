@@ -1,7 +1,6 @@
 #include <machine.hpp>
 #include <iostream>
 #include <iomanip>
-#include <io_devices/mmu.hpp>
 #include <memory>
 
 using namespace std;
@@ -88,14 +87,17 @@ Machine::Machine()
     mmu->ram = &ram;
     io_devices[0] = mmu;
 
+    ici = std::make_shared<ICI>(this);
+    io_devices[0x100] = ici;
+
     graphics = std::make_shared<Graphics>(this);
-    io_devices[0x0100] = graphics;
+    // io_devices[0x0100] = graphics;
 
     keyboard = std::make_shared<Keyboard>(this);
-    io_devices[0x0200] = keyboard;
+    // io_devices[0x0200] = keyboard;
 
     disk_ctrl = std::make_shared<DiskCtrl>(this);
-    io_devices[0x0300] = disk_ctrl;
+    // io_devices[0x0300] = disk_ctrl;
 }
 
 void Machine::queue_interrupt(uint8_t interrupt)
