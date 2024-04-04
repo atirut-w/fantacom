@@ -87,8 +87,11 @@ Machine::Machine()
     mmu->ram = &ram;
     io_devices[0] = mmu;
 
+    debug = std::make_shared<Debug>();
+    io_devices[0x0100] = debug;
+
     ici = std::make_shared<ICI>(this);
-    io_devices[0x100] = ici;
+    // io_devices[0x100] = ici;
 
     graphics = std::make_shared<Graphics>(this);
     // io_devices[0x0100] = graphics;

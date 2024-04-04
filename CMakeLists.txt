@@ -23,6 +23,7 @@ add_executable("fantacom"
     "src/io_devices/keyboard.cpp"
     "src/io_devices/disk_ctrl.cpp"
     "src/io_devices/ici.cpp"
+    "src/io_devices/debug.cpp"
 
     "src/ici_devices/graphics.cpp"
 )
