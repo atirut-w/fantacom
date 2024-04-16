@@ -16,9 +16,9 @@ int init_display()
     if (bank == -1)
         return -1;
 
-    outc_port(3, bank);
+    outb(3, bank);
     memset((char *)0x3000, 0, 80 * 25 * 2);
-    outc_port(0x0100, 0x30); // Set VGA buffer to 0x3000
+    outb(0x0100, 0x30); // Set VGA buffer to 0x3000
     return 0;
 }
 
@@ -50,7 +50,7 @@ __endasm;
 
 int main()
 {
-    outc_port(0x0100, 0); // Assure the user we entered BIOS by flashing the ROM's guts
+    outb(0x0100, 0); // Assure the user we entered BIOS by flashing the ROM's guts
     memory_init_meminfo();
     if (init_display() != 0)
         return -1;
@@ -75,7 +75,7 @@ int main()
             printf("Could not allocate memory for boot sector\n");
             return -1;
         }
-        outc_port(0x8, bank);
+        outb(0x8, bank);
     }
 
     disk_read(disk_scratch);

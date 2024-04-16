@@ -11,7 +11,7 @@ void memory_init_meminfo()
     volatile char *test_ptr = (char *)0x3000;
     memset(&meminfo, 0, sizeof(MemInfo));
 
-    uint8_t bios_ram = inc_port(2);
+    uint8_t bios_ram = inb(2);
     meminfo.bankmap[(bios_ram / 8)] |= (1 << (bios_ram % 8));
     meminfo.reserved[(bios_ram / 8)] |= (1 << (bios_ram % 8));
     meminfo.num_banks = 1;
@@ -19,7 +19,7 @@ void memory_init_meminfo()
     uint8_t bank = bios_ram + 1;
     do
     {
-        outc_port(3, bank);
+        outb(3, bank);
         *test_ptr = 0x55;
         if (*test_ptr == 0x55)
         {
