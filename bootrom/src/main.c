@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <memory.h>
+#include <debug.h>
 
 char *disk_scratch = (char *)0x8000;
 
@@ -52,6 +53,10 @@ __endasm;
 
 int main()
 {
+    debug_status(255);
+
+    return 0;
+
     memory_init_meminfo();
     if (init_display() != 0)
         return -1;
