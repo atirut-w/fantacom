@@ -55,7 +55,7 @@ void out(void *ctx, uint16_t port, uint8_t val)
 uint8_t int_ack(void *ctx, uint16_t address)
 {
     Machine &machine = *(Machine *)ctx;
-    z80_int(&machine.cpu, 0);
+    machine.cpu.interrupt(false);
     
     if (machine.interrupt_queue.size() > 0)
     {
@@ -71,7 +71,6 @@ uint8_t int_ack(void *ctx, uint16_t address)
 
 Machine::Machine()
 {
-    std::memset(&cpu, 0, sizeof(cpu)); // TODO: Z80 core as a C++ library and not C
     cpu.context = this;
 
     cpu.fetch_opcode = read;
@@ -113,15 +112,15 @@ void Machine::queue_interrupt(uint8_t interrupt)
 
 void Machine::nmi_interrupt()
 {
-    z80_nmi(&cpu);
+    cpu.nmi();
 }
 
 int Machine::run(int cycles)
 {
     mutex.lock();
     if (interrupt_queue.size() > 0)
-        z80_int(&cpu, 1);
-    int actual_cycles = z80_run(&cpu, cycles);
+        cpu.interrupt(true);
+    int actual_cycles = cpu.run(cycles);
     mutex.unlock();
     return actual_cycles;
 }
