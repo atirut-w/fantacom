@@ -1,4 +1,4 @@
-#include <io_devices/graphics.hpp>
+#include <ici_devices/graphics.hpp>
 #include <machine.hpp>
 #include <raylib.h>
 
@@ -27,12 +27,12 @@ Color palette[16] = {
     {255,255,255,255} // White
 };
 
-Graphics::Graphics(void *ctx) : IODevice(ctx)
+Graphics::Graphics(void *ctx) : ICIDevice(ctx)
 {
-    size = sizeof(registers);
+    
 }
 
-uint8_t Graphics::in(uint16_t addr)
+uint8_t Graphics::read(uint16_t addr)
 {
     if (addr < sizeof(registers))
     {
@@ -41,7 +41,7 @@ uint8_t Graphics::in(uint16_t addr)
     return 0;
 }
 
-void Graphics::out(uint16_t addr, uint8_t val)
+void Graphics::write(uint16_t addr, uint8_t val)
 {
     if (addr < sizeof(registers))
     {

@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <memory.h>
+#include <debug.h>
 
 char *disk_scratch = (char *)0x8000;
 
@@ -18,7 +19,9 @@ int init_display()
 
     outb(3, bank);
     memset((char *)0x3000, 0, 80 * 25 * 2);
-    outb(0x0100, 0x30); // Set VGA buffer to 0x3000
+    outb(0x0101, 0);
+    outb(0x0102, 8);
+    outb(0x0103, 0x30); // Set VGA buffer to 0x3000
     return 0;
 }
 
@@ -50,7 +53,10 @@ __endasm;
 
 int main()
 {
-    outb(0x0100, 0); // Assure the user we entered BIOS by flashing the ROM's guts
+    debug_status(255);
+
+    return 0;
+
     memory_init_meminfo();
     if (init_display() != 0)
         return -1;
