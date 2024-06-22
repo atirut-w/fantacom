@@ -5,11 +5,11 @@ configure_file(link.ld link.ld)
 
 add_executable(bootrom
     src/reset.s
-    src/startup.s
+    src/rt0.s
 )
 target_link_options(bootrom PRIVATE -T link.ld)
 
-add_custom_target(bootrom.bin
+add_custom_target(bootrom.bin ALL
     COMMAND ${CMAKE_OBJCOPY} -O binary bootrom bootrom.bin
     DEPENDS bootrom
     BYPRODUCTS bootrom.bin

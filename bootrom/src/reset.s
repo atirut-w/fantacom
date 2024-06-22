@@ -13,7 +13,6 @@
     .global _start
 rst00:
     jp _start
-    ret
 
 .rept 7
     .balign 8

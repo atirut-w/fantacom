@@ -1,4 +1,5 @@
 ENTRY(rst00)
+__stack_size = 0x100;
 
 MEMORY
 {
@@ -25,3 +26,9 @@ SECTIONS
         *(.bss)
     } > RAM
 }
+
+__data_load = LOADADDR(.data);
+__data_start = ADDR(.data);
+__data_size = SIZEOF(.data);
+
+__sp_init = __data_start + __data_size + __stack_size;
