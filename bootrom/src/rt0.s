@@ -24,6 +24,7 @@ _start:
 2:
     ld sp, __sp_init
     call _init_data
+    call main
     jp _hang
 
     .type _init_data, @function
