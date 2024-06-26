@@ -30,6 +30,13 @@ _start:
 
     .type _init_data, @function
 _init_data:
+    ld a, __data_size
+    or a
+    ret z
+    ld a, __data_size >> 8
+    or a
+    ret z
+
     ld hl, __data_load
     ld de, __data_start
     ld bc, __data_size
