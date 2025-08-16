@@ -6,6 +6,10 @@ using argparse::ArgumentParser;
 std::unique_ptr<const ArgumentParser> parse_args(int argc, char *argv[]) {
   auto parser = std::make_unique<ArgumentParser>("fantacom");
 
+  parser->add_argument("-b", "--bios")
+      .help("Path to the BIOS file")
+      .default_value("bios.bin");
+
   try {
     parser->parse_args(argc, argv);
     return parser;
