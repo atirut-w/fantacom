@@ -59,7 +59,6 @@ int main(int argc, char *argv[]) {
     int target = static_cast<int>(FREQ * delta);
     int ran = board.cpu.tick(target - clk_adjust);
     clk_adjust = ran - target;
-    std::cout << "Target: " << target << ", Ran: " << ran << ", Clock Adjust: " << clk_adjust << std::endl;
 
     BeginDrawing();
     ClearBackground(BLACK);
