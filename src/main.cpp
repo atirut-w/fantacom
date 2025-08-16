@@ -56,9 +56,6 @@ int main(int argc, char *argv[]) {
   while (!WindowShouldClose()) {
     float delta = GetFrameTime();
     int target = static_cast<int>(FREQ * delta);
-    if (target < 0) {
-      target = 1; // Just in case
-    }
     int ran = board.cpu.tick(target - clk_adjust);
     clk_adjust = ran - target;
     std::cout << "Target: " << target << ", Ran: " << ran << ", Clock Adjust: " << clk_adjust << std::endl;

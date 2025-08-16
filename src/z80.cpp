@@ -101,5 +101,8 @@ Z80Wrapper::Z80Wrapper() {
 }
 
 int Z80Wrapper::tick(int cycles) {
+  if (cycles < 0) {
+    cycles = 1;
+  }
   return z80_execute(&impl, cycles);
 }
