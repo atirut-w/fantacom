@@ -14,6 +14,7 @@ public:
   std::vector<uint8_t> ram;
   std::array<uint8_t, 16> pagetable;
   Bus<uint16_t> io;
+  uint8_t vram_start = 0;
 
   Board();
 

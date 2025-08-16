@@ -1,5 +1,6 @@
 #include "board.hpp"
 #include <cstdint>
+#include <iostream>
 
 Board::Board() {
   // ROM
@@ -41,6 +42,36 @@ Board::Board() {
     [this](uint32_t address, uint8_t value) {
       if (address < pagetable.size()) {
         pagetable[address] = value;
+      }
+    }
+  });
+  // VRAM start page
+  io.add_device({
+    0x0100,
+    [this](uint32_t address) -> uint8_t {
+      if (address == 0) {
+        return vram_start;
+      }
+      return 0;
+    },
+    [this](uint32_t address, uint8_t value) {
+      if (address == 0) {
+        vram_start = value;
+      }
+    }
+  });
+  // Debug console
+  io.add_device({
+    0x0200,
+    [this](uint32_t address) -> uint8_t {
+      if (address == 0) {
+        return std::cin.get();
+      }
+      return 0;
+    },
+    [this](uint32_t address, uint8_t value) {
+      if (address == 0) {
+        std::cout << value;
       }
     }
   });
