@@ -2,6 +2,7 @@
 #include <cstdint>
 
 Board::Board() {
+  // ROM
   physical.add_device({
     0x00000,
     [this](uint32_t address) -> uint8_t {
@@ -12,6 +13,7 @@ Board::Board() {
     },
     [](uint32_t address, uint8_t value) {}
   });
+  // RAM
   physical.add_device({
     0x80000,
     [this](uint32_t address) -> uint8_t {
@@ -23,6 +25,22 @@ Board::Board() {
     [this](uint32_t address, uint8_t value) {
       if (address < ram.size()) {
         ram[address] = value;
+      }
+    }
+  });
+
+  // MMU page table
+  io.add_device({
+    0x0000,
+    [this](uint32_t address) -> uint8_t {
+      if (address < pagetable.size()) {
+        return pagetable[address];
+      }
+      return 0;
+    },
+    [this](uint32_t address, uint8_t value) {
+      if (address < pagetable.size()) {
+        pagetable[address] = value;
       }
     }
   });
