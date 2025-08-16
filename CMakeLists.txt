@@ -8,4 +8,4 @@ add_executable(fantacom
     src/board.cpp
 )
 target_include_directories(fantacom PRIVATE include)
-target_link_libraries(fantacom PRIVATE argparse Z80)
+target_link_libraries(fantacom PRIVATE argparse Z80 raylib)

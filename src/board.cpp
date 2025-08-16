@@ -60,21 +60,6 @@ Board::Board() {
       }
     }
   });
-  // Debug console
-  io.add_device({
-    0x0200,
-    [this](uint32_t address) -> uint8_t {
-      if (address == 0) {
-        return std::cin.get();
-      }
-      return 0;
-    },
-    [this](uint32_t address, uint8_t value) {
-      if (address == 0) {
-        std::cout << value;
-      }
-    }
-  });
 
   cpu.read = [this](uint16_t address) -> uint8_t {
     uint32_t resolved = resolve_address(address);

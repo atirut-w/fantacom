@@ -91,8 +91,8 @@ Z80Wrapper::Z80Wrapper() {
     }
     return 0;
   };
-  impl.illegal = [](void *self, uint8_t opcode) -> uint8_t {
-    auto wrapper = static_cast<Z80Wrapper*>(self);
+  impl.illegal = [](Z80 *cpu, uint8_t opcode) -> uint8_t {
+    auto wrapper = static_cast<Z80Wrapper*>(cpu->context);
     if (wrapper->illegal) {
       return wrapper->illegal(opcode);
     }

@@ -1,7 +1,11 @@
 #include "argparse/argparse.hpp"
 #include "board.hpp"
+#include "raylib.h"
 #include <fstream>
+#include <iostream>
 #include <memory>
+
+#define FREQ 4000000 // 4 MHz
 
 using argparse::ArgumentParser;
 
@@ -46,9 +50,26 @@ int main(int argc, char *argv[]) {
 
   board.ram.resize(args->get<unsigned int>("--memory") * 4096);
 
-  while (1) {
-    board.cpu.tick(1);
+  InitWindow(640, 480, "Fantacom");
+  int clk_adjust = 0;
+
+  while (!WindowShouldClose()) {
+    float delta = GetFrameTime();
+    int target = static_cast<int>(FREQ * delta);
+    if (target < 0) {
+      target = 1; // Just in case
+    }
+    int ran = board.cpu.tick(target - clk_adjust);
+    clk_adjust = ran - target;
+    std::cout << "Target: " << target << ", Ran: " << ran << ", Clock Adjust: " << clk_adjust << std::endl;
+
+    BeginDrawing();
+    ClearBackground(BLACK);
+    DrawFPS(10, 10);
+    EndDrawing();
   }
+
+  CloseWindow();
 
   return 0;
 }

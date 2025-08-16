@@ -1,4 +1,5 @@
 add_subdirectory(argparse)
+add_subdirectory(raylib)
 
 # "Package maintainers are encouraged to use at least the following options for the shared library"
 # I'll take that as "use these options for the most accurate emulation"
