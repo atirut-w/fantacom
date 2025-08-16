@@ -8,7 +8,7 @@
 
 class Board {
 public:
-  Z80 cpu;
+  Z80Wrapper cpu;
   Bus<uint32_t> physical;
   std::array<uint8_t, 8192> rom;
   std::vector<uint8_t> ram;

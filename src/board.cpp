@@ -59,6 +59,9 @@ Board::Board() {
   cpu.out = [this](uint16_t port, uint8_t value) {
     io.write(port, value);
   };
+
+  cpu.fetch_opcode = cpu.read;
+  cpu.fetch = cpu.read;
 }
 
 uint32_t Board::resolve_address(uint16_t address) const {

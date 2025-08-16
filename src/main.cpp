@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
   board.ram.resize(args->get<unsigned int>("--memory") * 4096);
 
   while (1) {
-    board.cpu.tick();
+    board.cpu.tick(1);
   }
 
   return 0;
