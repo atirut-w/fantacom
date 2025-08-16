@@ -37,7 +37,7 @@ struct Bus {
   void write(Address address, uint8_t value) {
     for (const auto &device : devices) {
       if (address >= device.start) {
-        device.write(address, value);
+        device.write(address - device.start, value);
         return;
       }
     }
