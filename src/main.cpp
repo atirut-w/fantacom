@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
   board.ram.resize(args->get<unsigned int>("--memory") * 4096);
 
   InitWindow(640, 480, "Fantacom");
+  SetTargetFPS(60);
   int clk_adjust = 0;
 
   while (!WindowShouldClose()) {
