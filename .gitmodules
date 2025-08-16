@@ -4,6 +4,3 @@
 [submodule "3rd/raylib"]
 	path = 3rd/raylib
 	url = https://github.com/raysan5/raylib
-[submodule "3rd/chips"]
-	path = 3rd/chips
-	url = https://github.com/floooh/chips/
