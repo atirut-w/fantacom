@@ -1,102 +1,60 @@
 #include "board.hpp"
 #include <cstdint>
+#include <cstdio>
 #include <iostream>
 
 Board::Board() {
-  // ROM
-  physical.add_device({
-    0x00000,
-    [this](uint32_t address) -> uint8_t {
-      if (address < rom.size()) {
-        return rom[address];
-      }
-      return 0;
+  display.physical = &physical;
+  mmu.physical = &physical;
+  mmu.io = &io;
+
+  // MMU configuration
+  io.devices.push_back({
+    0x0000, 0x0010,
+    [this](uint16_t address) -> uint8_t {
+      return mmu.pagetable[address];
     },
-    [](uint32_t address, uint8_t value) {}
-  });
-  // RAM
-  physical.add_device({
-    0x80000,
-    [this](uint32_t address) -> uint8_t {
-      if (address < ram.size()) {
-        return ram[address];
-      }
-      return 0;
-    },
-    [this](uint32_t address, uint8_t value) {
-      if (address < ram.size()) {
-        ram[address] = value;
-      }
+    [this](uint16_t address, uint8_t value) {
+      mmu.pagetable[address] = value;
     }
   });
 
-  // MMU page table
-  io.add_device({
-    0x0000,
-    [this](uint32_t address) -> uint8_t {
-      if (address < pagetable.size()) {
-        return pagetable[address];
-      }
-      return 0;
+  // VGA configuration
+  io.devices.push_back({
+    0x0200, 0x0001,
+    [this](uint16_t address) -> uint8_t {
+      return display.vram_start;
     },
-    [this](uint32_t address, uint8_t value) {
-      if (address < pagetable.size()) {
-        pagetable[address] = value;
-      }
+    [this](uint16_t address, uint8_t value) {
+      display.vram_start = value;
     }
   });
-  // VRAM start page
-  io.add_device({
-    0x0100,
-    [this](uint32_t address) -> uint8_t {
-      if (address == 0) {
-        return vram_start;
-      }
-      return 0;
-    },
-    [this](uint32_t address, uint8_t value) {
-      if (address == 0) {
-        vram_start = value;
-      }
-    }
-  });
+  
   // Debug console
-  io.add_device({
-    0x0200,
-    [this](uint32_t address) -> uint8_t {
-      if (address == 0) {
-        return std::cin.get();
-      }
-      return 0;
+  io.devices.push_back({
+    0x0300, 0x0001,
+    [this](uint16_t address) -> uint8_t {
+      int val = std::cin.get();
+      return val == EOF ? 0 : val;
     },
-    [this](uint32_t address, uint8_t value) {
-      if (address == 0) {
-        std::cout << value;
-      }
+    [this](uint16_t address, uint8_t value) {
+      std::cout << value;
     }
   });
 
   cpu.read = [this](uint16_t address) -> uint8_t {
-    uint32_t resolved = resolve_address(address);
-    return physical.read(resolved);
+    return mmu.read(address);
   };
   cpu.write = [this](uint16_t address, uint8_t value) {
-    uint32_t resolved = resolve_address(address);
-    physical.write(resolved, value);
+    mmu.write(address, value);
   };
   cpu.in = [this](uint16_t port) -> uint8_t {
-    return io.read(port);
+    return mmu.in(port);
   };
   cpu.out = [this](uint16_t port, uint8_t value) {
-    io.write(port, value);
+    mmu.out(port, value);
   };
 
   cpu.fetch_opcode = cpu.read;
   cpu.fetch = cpu.read;
-}
-
-uint32_t Board::resolve_address(uint16_t address) const {
-  int vpage = address >> 12;
-  int offset = address & 0xFFF;
-  return (pagetable[vpage] << 12) | offset;
 }

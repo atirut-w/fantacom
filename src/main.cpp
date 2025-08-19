@@ -46,11 +46,11 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  bios_file.read(reinterpret_cast<char *>(board.rom.data()), board.rom.size());
+  bios_file.read(reinterpret_cast<char *>(board.physical.rom.data()), board.physical.rom.size());
   bios_file.close();
 
-  board.ram.resize(args->get<unsigned int>("--memory") * 4096);
-  std::fill(board.ram.begin(), board.ram.end(), 0b01010101);
+  board.physical.ram.resize(args->get<unsigned int>("--memory") * 4096);
+  std::fill(board.physical.ram.begin(), board.physical.ram.end(), 0b01010101);
 
   InitWindow(80 * 8, 25 * 16, "Fantacom");
   SetTargetFPS(60);
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
 
     const int CHAR_WIDTH = 8;
     const int CHAR_HEIGHT = 16;
-    int vram_base = board.vram_start << 12;
+    int vram_base = board.display.vram_start << 12;
     int vga_buffer = vram_base + CHAR_HEIGHT * 256;
 
     for (int row = 0; row < 25; ++row) {
