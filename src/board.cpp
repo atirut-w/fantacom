@@ -23,13 +23,22 @@ Board::Board() {
   io.devices.push_back({
     0x0200, 0x0001,
     [this](uint16_t address) -> uint8_t {
-      return display.vram_start;
+      return display.mode;
     },
     [this](uint16_t address, uint8_t value) {
-      display.vram_start = value;
+      display.mode = value;
     }
   });
-  
+  io.devices.push_back({
+    0x0201, 0x0004,
+    [this](uint16_t address) -> uint8_t {
+      return display.plane_pages[address];
+    },
+    [this](uint16_t address, uint8_t value) {
+      display.plane_pages[address] = value;
+    }
+  });
+
   // Debug console
   io.devices.push_back({
     0x0300, 0x0001,
